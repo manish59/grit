@@ -5,7 +5,7 @@ title: GRIT - Genomic Range Interval Toolkit
 
 # GRIT Documentation
 
-**GRIT** (Genomic Range Interval Toolkit) is a high-performance Rust implementation of common BED file operations. It provides streaming algorithms with O(k) memory complexity, achieving **3-13x speedup** over bedtools with **up to 1000x less memory**.
+**GRIT** (Genomic Range Interval Toolkit) is a high-performance Rust implementation of common BED file operations. It provides streaming algorithms with O(k) memory complexity, achieving **3-15x speedup** over bedtools with **up to 1000x less memory**.
 
 ## Installation
 
@@ -52,6 +52,7 @@ grit coverage -a genes.bed -b reads.bed --assume-sorted
 | [genomecov](commands/genomecov.html) | Compute genome-wide coverage |
 | [jaccard](commands/jaccard.html) | Calculate Jaccard similarity between two BED files |
 | [multiinter](commands/multiinter.html) | Identify common intervals across multiple files |
+| [generate](commands/generate.html) | Generate synthetic BED datasets for testing |
 
 ## Global Options
 
