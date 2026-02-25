@@ -1,0 +1,47 @@
+[package]
+name = "grit"
+version = "0.1.0"
+edition = "2021"
+authors = ["Manish Kumar Bobbili"]
+description = "GRIT: Genomic Range Interval Toolkit - high-performance genomic interval operations"
+license = "MIT"
+repository = "https://github.com/manish59/grit"
+homepage = "https://github.com/manish59/grit"
+documentation = "https://github.com/manish59/grit#readme"
+readme = "README.md"
+keywords = ["bioinformatics", "genomics", "intervals", "grit", "bedtools"]
+categories = ["science", "command-line-utilities"]
+exclude = [".idea/", "benchmarks/data/", "benchmarks/results/", "target/"]
+
+[lib]
+name = "grit"
+path = "src/lib.rs"
+
+[[bin]]
+name = "grit"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+rayon = "1.10"
+thiserror = "2"
+crossbeam-channel = "0.5"
+memchr = "2.7"
+itoa = "1.0"
+memmap2 = "0.9"
+rustc-hash = "2.0"
+ryu = "1.0"
+rand = { version = "0.8", features = ["small_rng"] }
+tempfile = "3"
+
+[dev-dependencies]
+serial_test = "3"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.bench]
+lto = true
+codegen-units = 1

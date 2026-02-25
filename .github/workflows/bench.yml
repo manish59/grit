@@ -1,0 +1,97 @@
+name: Benchmarks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install bedtools (for comparison)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bedtools
+
+      - name: Generate test data
+        run: |
+          mkdir -p benches/datasets
+          # Generate random BED files for benchmarking
+          python3 << 'EOF'
+          import random
+
+          def generate_bed(filename, num_intervals, chroms=["chr1", "chr2", "chr3"]):
+              with open(filename, 'w') as f:
+                  for _ in range(num_intervals):
+                      chrom = random.choice(chroms)
+                      start = random.randint(0, 100000000)
+                      end = start + random.randint(100, 10000)
+                      f.write(f"{chrom}\t{start}\t{end}\n")
+
+          generate_bed("benches/datasets/small_a.bed", 10000)
+          generate_bed("benches/datasets/small_b.bed", 10000)
+          generate_bed("benches/datasets/medium_a.bed", 100000)
+          generate_bed("benches/datasets/medium_b.bed", 100000)
+          EOF
+
+      - name: Build release
+        run: cargo build --release
+
+      - name: Run Criterion benchmarks
+        run: cargo bench --bench intersect --bench merge --bench sort -- --noplot
+
+      - name: Compare with bedtools
+        run: |
+          echo "## bedtools-rs vs bedtools comparison" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Sort comparison
+          echo "### Sort (100K intervals)" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "bedtools-rs:" >> $GITHUB_STEP_SUMMARY
+          /usr/bin/time -v ./target/release/bedtools-rs sort -i benches/datasets/medium_a.bed > /dev/null 2>&1 || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "bedtools:" >> $GITHUB_STEP_SUMMARY
+          /usr/bin/time -v bedtools sort -i benches/datasets/medium_a.bed > /dev/null 2>&1 || true
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+          # Intersect comparison
+          echo "### Intersect (100K x 100K intervals)" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "bedtools-rs:" >> $GITHUB_STEP_SUMMARY
+          /usr/bin/time -v ./target/release/bedtools-rs intersect -a benches/datasets/medium_a.bed -b benches/datasets/medium_b.bed > /dev/null 2>&1 || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "bedtools:" >> $GITHUB_STEP_SUMMARY
+          /usr/bin/time -v bedtools intersect -a benches/datasets/medium_a.bed -b benches/datasets/medium_b.bed > /dev/null 2>&1 || true
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: target/criterion/

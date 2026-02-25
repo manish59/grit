@@ -1,0 +1,10 @@
+chr1	0	1	zero_start	1	+
+chr1	100	100	zero_length	2	+
+chr1	100	101	single_bp	3	+
+chr1	999999999	1000000000	large_coords	4	-
+chr10	100	200	chr10_natural	5	+
+chr2	100	200	chr2_natural	6	+
+chr1	100	200	dup1	7	+
+chr1	100	200	dup2	8	-
+chrM	100	200	mito	9	+
+chrUn	100	200	unplaced	10	+

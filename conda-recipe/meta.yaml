@@ -1,0 +1,39 @@
+package:
+  name: grit
+  version: "0.1.0"
+
+source:
+  url: https://github.com/manish59/grit/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: PLACEHOLDER_SHA256
+
+build:
+  number: 0
+  script: cargo install --locked --root $PREFIX --path .
+
+requirements:
+  build:
+    - {{ compiler('rust') }}
+    - cargo-bundle-licenses
+  host:
+    - rust
+  run: []
+
+test:
+  commands:
+    - grit --version
+
+about:
+  home: https://github.com/manish59/grit
+  license: MIT
+  license_file: LICENSE
+  summary: "GRIT: Genomic Range Interval Toolkit"
+  description: |
+    GRIT (Genomic Range Interval Toolkit) is a high-performance toolkit for
+    genomic interval operations. Supports intersect, merge, sort, subtract,
+    closest, coverage, slop, complement, genomecov, jaccard, multiinter, and
+    window commands.
+  dev_url: https://github.com/manish59/grit
+
+extra:
+  recipe-maintainers:
+    - manish59

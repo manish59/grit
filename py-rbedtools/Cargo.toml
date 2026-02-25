@@ -1,0 +1,19 @@
+[package]
+name = "py-rbedtools"
+version = "0.1.0"
+edition = "2021"
+authors = ["Manish Kumar Bobbili"]
+description = "Python bindings for rbedtools"
+license = "MIT"
+
+[lib]
+name = "rbedtools"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.23", features = ["extension-module"] }
+numpy = "0.23"
+rayon = "1.10"
+
+# Link to the main library
+rbedtools = { path = ".." }

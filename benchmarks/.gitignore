@@ -1,0 +1,12 @@
+# Generated data - too large to commit
+data/
+datasets/
+results/
+reports/
+
+# Temporary benchmark outputs
+*.out
+*.time
+*.hash
+*.sorted
+*.sorted.bed
