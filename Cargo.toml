@@ -1,5 +1,5 @@
 [package]
-name = "grit"
+name = "grit-genomics"
 version = "0.1.0"
 edition = "2021"
 authors = ["Manish Kumar Bobbili"]
@@ -14,7 +14,7 @@ categories = ["science", "command-line-utilities"]
 exclude = [".idea/", "benchmarks/data/", "benchmarks/results/", "target/"]
 
 [lib]
-name = "grit"
+name = "grit_genomics"
 path = "src/lib.rs"
 
 [[bin]]
