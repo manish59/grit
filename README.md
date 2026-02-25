@@ -67,7 +67,7 @@ cargo install grit-genomics
 ### From Homebrew (macOS/Linux)
 
 ```bash
-brew tap manish59/grit && brew install grit
+brew install manish59/grit/grit
 ```
 
 ### From Source
