@@ -24,8 +24,7 @@ This directory contains packaging recipes for distributing GRIT.
 
 3. **Users can then install with**:
    ```bash
-   brew tap manish59/grit
-   brew install grit
+   brew install manish59/grit/grit
    ```
 
 ### Option 2: Submit to Homebrew Core
@@ -87,7 +86,7 @@ For wider distribution, submit a PR to [homebrew-core](https://github.com/Homebr
 | Method | Command |
 |--------|---------|
 | **crates.io** | `cargo install grit-genomics` |
-| **Homebrew** | `brew tap manish59/grit && brew install grit` |
+| **Homebrew** | `brew install manish59/grit/grit` |
 | **Bioconda** | `conda install -c bioconda grit-genomics` |
 | **From source** | `git clone ... && cargo build --release` |
 
