@@ -78,16 +78,19 @@ grit merge -i sorted.bed --assume-sorted
 
 ## Benchmarks
 
-Tested on 10M × 5M intervals:
+Tested on 10M × 5M intervals ([full methodology](benchmarks.html)):
 
 | Command | Speedup | Memory Reduction |
 |---------|---------|------------------|
-| intersect | 4.1x | 19x less |
-| subtract | 5.8x | 19x less |
-| coverage | 8.1x | 135x less |
-| closest | 4.7x | 59x less |
-| window | 13.5x | 138x less |
-| jaccard | 3.1x | 1160x less |
+| window | 15.3x | 137x less |
+| merge | 10.8x | ~same |
+| coverage | 9.0x | 134x less |
+| subtract | 6.5x | 19x less |
+| closest | 5.0x | 59x less |
+| intersect | 4.4x | 19x less |
+| jaccard | 3.1x | 1230x less |
+
+See [detailed benchmarks](benchmarks.html) for methodology and reproducibility instructions.
 
 ## Links
 
