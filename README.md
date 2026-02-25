@@ -3,6 +3,8 @@
 A high-performance genomic interval toolkit written in Rust. Drop-in replacement for bedtools with **2.8-8.3x faster** performance.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Crates.io](https://img.shields.io/crates/v/grit-genomics.svg)](https://crates.io/crates/grit-genomics)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://manish59.github.io/grit/)
 
 ---
 
@@ -10,6 +12,7 @@ A high-performance genomic interval toolkit written in Rust. Drop-in replacement
 
 - [Why GRIT?](#why-grit)
 - [Installation](#installation)
+- [Documentation](https://manish59.github.io/grit/)
 - [Quick Start](#quick-start)
 - [Commands](#commands)
   - [intersect](#intersect) - Find overlapping intervals
@@ -55,28 +58,26 @@ GRIT is designed for:
 
 ## Installation
 
-### From Source (Recommended)
+### From crates.io (Recommended)
+
+```bash
+cargo install grit-genomics
+```
+
+### From Homebrew (macOS/Linux)
+
+```bash
+brew tap manish59/grit
+brew install grit
+```
+
+### From Source
 
 ```bash
 git clone https://github.com/manish59/grit
 cd grit
 cargo build --release
-```
-
-### Install Globally
-
-After building, install GRIT so it can be used from anywhere:
-
-```bash
 cargo install --path .
-```
-
-This installs the `grit` binary to `~/.cargo/bin/`. Make sure this directory is in your `PATH`.
-
-### From crates.io
-
-```bash
-cargo install grit
 ```
 
 ### Verify Installation
@@ -85,6 +86,10 @@ cargo install grit
 grit --version
 grit --help
 ```
+
+### Documentation
+
+Full command documentation with examples: **[https://manish59.github.io/grit/](https://manish59.github.io/grit/)**
 
 ---
 
