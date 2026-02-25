@@ -28,6 +28,8 @@ A high-performance genomic interval toolkit written in Rust. Drop-in replacement
   - [genomecov](#genomecov) - Genome-wide coverage
   - [jaccard](#jaccard) - Similarity coefficient
   - [multiinter](#multiinter) - Multi-file intersection
+- [Utilities](#utilities)
+  - [generate](#generate) - Generate synthetic datasets
 - [Input Validation](#input-validation)
   - [Sort Order Validation](#sort-order-validation)
   - [Genome Order Validation](#genome-order-validation)
@@ -914,6 +916,95 @@ grit multiinter -i rep1.bed rep2.bed rep3.bed > multi.bed
 
 # Find intervals present in ALL files (consensus)
 grit multiinter -i rep1.bed rep2.bed rep3.bed --cluster > consensus.bed
+```
+
+---
+
+## Utilities
+
+---
+
+### generate
+
+Generate synthetic BED datasets for benchmarking and testing.
+
+#### When to Use
+
+- Create reproducible test data for benchmarking
+- Generate datasets with specific characteristics (uniform, clustered)
+- Test GRIT commands with controlled data sizes
+- Compare performance across different data distributions
+
+#### How to Use
+
+```
+grit generate [OPTIONS]
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `-o, --output <DIR>` | Output directory (default: `./grit_bench_data`) |
+| `--sizes <SIZES>` | Comma-separated sizes: `100K`, `1M`, `10M` |
+| `--mode <MODE>` | Distribution: `balanced`, `clustered`, `identical`, `skewed-a-gt-b`, `skewed-b-gt-a`, `all` |
+| `--seed <INT>` | Random seed for reproducibility (default: 42) |
+| `--a <SIZE>` | Custom A file size |
+| `--b <SIZE>` | Custom B file size |
+| `--sorted <yes\|no\|auto>` | Output sorting (default: `auto`) |
+| `--hotspot-frac <FLOAT>` | Genome fraction for hotspots (default: 0.05) |
+| `--hotspot-weight <FLOAT>` | Interval fraction in hotspots (default: 0.80) |
+| `--force` | Overwrite existing files |
+
+**Size Notation:**
+
+| Format | Example | Value |
+|--------|---------|-------|
+| Number | `1000` | 1,000 intervals |
+| K suffix | `100K` | 100,000 intervals |
+| M suffix | `10M` | 10,000,000 intervals |
+
+**Generation Modes:**
+
+| Mode | Description |
+|------|-------------|
+| `balanced` | Equal-sized A and B with uniform distribution |
+| `clustered` | Intervals concentrated in hotspot regions |
+| `identical` | A and B contain identical intervals |
+| `skewed-a-gt-b` | A file 10x larger than B |
+| `skewed-b-gt-a` | B file 10x larger than A |
+| `all` | Generate all modes |
+
+#### Examples
+
+```bash
+# Quick test data (100K intervals)
+grit generate --sizes 100K --mode balanced --force
+
+# Benchmark suite (multiple sizes)
+grit generate --sizes 1M,5M,10M --mode all --seed 42
+
+# Custom asymmetric sizes
+grit generate --a 10M --b 1M --mode balanced
+
+# Clustered data (simulates ChIP-seq peaks)
+grit generate --mode clustered --hotspot-frac 0.1 --hotspot-weight 0.9
+
+# Unsorted output for testing sort validation
+grit generate --sizes 1M --sorted no
+```
+
+**Output Structure:**
+
+```
+grit_bench_data/
+├── balanced/
+│   └── 1M/
+│       ├── A.bed
+│       └── B.bed
+├── clustered/
+│   └── ...
+└── ...
 ```
 
 ---
