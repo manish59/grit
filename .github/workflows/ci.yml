@@ -58,6 +58,16 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Install bedtools (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bedtools
+
+      - name: Install bedtools (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install bedtools
+
       - name: Build
         run: cargo build --verbose
 
