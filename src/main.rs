@@ -1322,7 +1322,7 @@ fn run_closest(
         cmd.ignore_overlaps = ignore_overlaps;
         cmd.ignore_upstream = ignore_upstream;
         cmd.ignore_downstream = ignore_downstream;
-        cmd.report_all_ties = tie.as_ref().map_or(true, |t| t == "all");
+        cmd.report_all_ties = tie.as_ref().is_none_or(|t| t == "all");
 
         cmd.run(file_a, file_b, &mut handle)?;
         Ok(())

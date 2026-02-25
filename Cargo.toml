@@ -2,7 +2,7 @@
 name = "grit-genomics"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.70"
+rust-version = "1.82"
 authors = ["Manish Kumar Bobbili"]
 description = "GRIT: Genomic Range Interval Toolkit - high-performance genomic interval operations"
 license = "MIT"

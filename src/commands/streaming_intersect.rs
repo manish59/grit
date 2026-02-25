@@ -799,7 +799,7 @@ impl StreamingIntersectCommand {
             }
 
             // Check if we've moved to a new chromosome
-            let chrom_changed = current_chrom.as_ref().map_or(true, |c| c != a_chrom);
+            let chrom_changed = current_chrom.as_ref().is_none_or(|c| c != a_chrom);
 
             if chrom_changed {
                 // Clear active set - different chromosome

@@ -369,7 +369,7 @@ impl IntersectEngine {
             let a_end = a_rec.end();
 
             // Handle chromosome change
-            if current_chrom.as_ref().map_or(true, |c| c != a_chrom) {
+            if current_chrom.as_ref().is_none_or(|c| c != a_chrom) {
                 active_b.clear();
                 current_chrom = Some(a_chrom.to_string());
 
