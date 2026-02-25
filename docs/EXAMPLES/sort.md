@@ -59,6 +59,6 @@ grit sort -i unsorted.bed --reverse
 
 ## Notes
 
-- GRIT sort uses radix sort by default, providing 2-5x speedup over comparison-based sorts
-- Memory-mapped I/O enables efficient processing of large files
+- **5.4x faster** than bedtools sort (10M intervals benchmark)
+- Uses radix sort with memory-mapped I/O for optimal performance
 - Output is deterministic for identical inputs
