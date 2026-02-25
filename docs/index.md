@@ -14,7 +14,7 @@ title: GRIT - Genomic Range Interval Toolkit
 cargo install grit-genomics
 
 # From Homebrew (macOS/Linux)
-brew install manish59/grit/grit
+brew tap manish59/grit && brew install grit
 
 # From Bioconda (coming soon)
 conda install -c bioconda grit-genomics
