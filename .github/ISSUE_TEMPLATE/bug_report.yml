@@ -1,0 +1,123 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in GRIT
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the form below.
+
+  - type: input
+    id: grit-version
+    attributes:
+      label: GRIT Version
+      description: Output of `grit --version`
+      placeholder: "grit 0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Linux (Ubuntu/Debian)
+        - Linux (RHEL/CentOS)
+        - Linux (Other)
+        - macOS (Intel)
+        - macOS (Apple Silicon)
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: rust-version
+    attributes:
+      label: Rust Version (if building from source)
+      description: Output of `rustc --version`
+      placeholder: "rustc 1.75.0"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installation Method
+      options:
+        - cargo install
+        - Homebrew
+        - From source
+        - Pre-built binary
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of the bug
+      placeholder: Describe what happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Minimal steps to reproduce the behavior
+      placeholder: |
+        1. Create a BED file with: `echo -e "chr1\t100\t200" > test.bed`
+        2. Run: `grit merge -i test.bed`
+        3. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened (include error messages)
+    validations:
+      required: true
+
+  - type: textarea
+    id: bedtools-comparison
+    attributes:
+      label: bedtools Comparison
+      description: If applicable, show the bedtools output for comparison
+      placeholder: |
+        bedtools command: `bedtools merge -i test.bed`
+        bedtools output: ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context (logs, screenshots, sample files)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues for duplicates
+          required: true
+        - label: I am using the latest version of GRIT
+          required: false
+        - label: I can provide sample data to reproduce the issue
+          required: false

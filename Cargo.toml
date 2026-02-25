@@ -2,12 +2,13 @@
 name = "grit-genomics"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.70"
 authors = ["Manish Kumar Bobbili"]
 description = "GRIT: Genomic Range Interval Toolkit - high-performance genomic interval operations"
 license = "MIT"
 repository = "https://github.com/manish59/grit"
 homepage = "https://github.com/manish59/grit"
-documentation = "https://github.com/manish59/grit#readme"
+documentation = "https://docs.rs/grit-genomics"
 readme = "README.md"
 keywords = ["bioinformatics", "genomics", "intervals", "grit", "bedtools"]
 categories = ["science", "command-line-utilities"]

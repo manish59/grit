@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/manish59/grit/discussions
+    about: Ask questions and discuss GRIT usage
+  - name: Documentation
+    url: https://manish59.github.io/grit/
+    about: Check the documentation for usage guides

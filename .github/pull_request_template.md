@@ -1,6 +1,6 @@
 ## Description
 
-Brief description of the changes in this PR.
+<!-- Brief description of the changes in this PR -->
 
 ## Type of Change
 
@@ -10,30 +10,43 @@ Brief description of the changes in this PR.
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
 - [ ] Documentation update
 - [ ] Refactoring (no functional changes)
+- [ ] CI/tooling improvement
 
 ## Testing
 
-- [ ] Added unit tests
-- [ ] Added integration tests
+- [ ] Added unit tests for new functionality
+- [ ] Added integration tests (if applicable)
 - [ ] Verified SHA256 parity with bedtools (if applicable)
 - [ ] Tested with large files (if performance-related)
+- [ ] Tested streaming mode (if applicable)
 
 ## Checklist
 
 - [ ] Code follows project style guidelines
-- [ ] `cargo fmt` produces no changes
-- [ ] `cargo clippy` produces no warnings
-- [ ] `cargo test` passes
+- [ ] `cargo fmt --all` produces no changes
+- [ ] `cargo clippy --all-targets -- -D warnings` produces no warnings
+- [ ] `cargo test --all` passes
 - [ ] Documentation updated (if applicable)
-- [ ] CHANGELOG.md updated (if applicable)
+- [ ] CHANGELOG.md updated (for user-facing changes)
 
 ## Performance Impact
 
-If this PR affects performance, describe:
-- Benchmarks before/after
-- Memory usage changes
-- Time complexity changes
+<!-- If this PR affects performance, describe: -->
+<!-- - Benchmarks before/after -->
+<!-- - Memory usage changes -->
+<!-- - Time complexity changes -->
+
+N/A or describe impact...
+
+## Streaming Correctness
+
+<!-- If this PR affects streaming algorithms: -->
+<!-- - Verified O(k) memory bound maintained -->
+<!-- - Tested with sorted input validation -->
+<!-- - Checked edge cases (empty files, single interval, etc.) -->
+
+N/A or describe verification...
 
 ## Related Issues
 
-Closes #XXX (if applicable)
+<!-- Link related issues: Closes #XXX, Fixes #XXX, Related to #XXX -->

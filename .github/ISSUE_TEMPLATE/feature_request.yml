@@ -1,0 +1,87 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for GRIT
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please fill out the form below.
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe the problem you're trying to solve
+      placeholder: |
+        I'm working on [analysis type] and need to [operation].
+        Currently, I have to [workaround], which is inefficient because...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed feature or enhancement
+      placeholder: |
+        Add a `--flag` option to the `grit [command]` that would...
+    validations:
+      required: true
+
+  - type: textarea
+    id: bedtools-behavior
+    attributes:
+      label: bedtools Comparison
+      description: How does bedtools handle this? Is there equivalent functionality?
+      placeholder: |
+        bedtools command: `bedtools [command] [options]`
+        bedtools behavior: ...
+
+        GRIT should: [match/differ/extend] because...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to your workflow?
+      options:
+        - Nice to have
+        - Would improve my workflow
+        - Critical for my use case
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Other solutions you've considered
+    validations:
+      required: false
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation Ideas
+      description: If you have ideas on how to implement this (optional)
+      placeholder: |
+        - Could be implemented in the [module] by...
+        - Would require changes to...
+        - Performance considerations: ...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues and this feature hasn't been requested
+          required: true
+        - label: I am willing to help implement this feature
+          required: false
+        - label: I can provide test data for this feature
+          required: false

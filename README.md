@@ -2,8 +2,12 @@
 
 A high-performance genomic interval toolkit written in Rust. Drop-in replacement for bedtools with **3-15x faster** performance.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/manish59/grit/actions/workflows/ci.yml/badge.svg)](https://github.com/manish59/grit/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/manish59/grit/branch/main/graph/badge.svg)](https://codecov.io/gh/manish59/grit)
 [![Crates.io](https://img.shields.io/crates/v/grit-genomics.svg)](https://crates.io/crates/grit-genomics)
+[![docs.rs](https://docs.rs/grit-genomics/badge.svg)](https://docs.rs/grit-genomics)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/rust-1.70%2B-blue.svg)](https://www.rust-lang.org)
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://manish59.github.io/grit/)
 
 ---
