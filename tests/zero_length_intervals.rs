@@ -5,8 +5,8 @@
 //!
 //! Note: Tests are run serially to avoid global config race conditions.
 
-use grit::bed::{parse_intervals, BedReader, FastBedParser};
-use grit::config;
+use grit_genomics::bed::{parse_intervals, BedReader, FastBedParser};
+use grit_genomics::config;
 use serial_test::serial;
 
 /// Reset config to default state before each test

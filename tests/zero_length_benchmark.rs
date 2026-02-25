@@ -3,8 +3,8 @@
 //! Verifies that bedtools-compatible mode has negligible (<1%) overhead
 //! compared to strict mode during parsing.
 
-use grit::bed::FastBedParser;
-use grit::config;
+use grit_genomics::bed::FastBedParser;
+use grit_genomics::config;
 use serial_test::serial;
 use std::time::Instant;
 

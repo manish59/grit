@@ -556,7 +556,7 @@ mod tests {
         // 150-175: depth 1 (25 bases)
         // 175-200: depth 0 (25 bases)
         assert_eq!(bases_covered, 75);
-        assert_eq!(total_depth, 25 * 1 + 25 * 2 + 25 * 1 + 25 * 0); // 100
+        assert_eq!(total_depth, 100); // 25*1 + 25*2 + 25*1 + 25*0
         assert_eq!(histogram.get(&0), Some(&25));
         assert_eq!(histogram.get(&1), Some(&50));
         assert_eq!(histogram.get(&2), Some(&25));

@@ -471,7 +471,7 @@ fn test_determinism_multiple_runs() {
             .args(["sort", "--fast", "-i", input_path])
             .stdout(File::create(output).unwrap())
             .status()
-            .expect(&format!("Failed to run grit (run {})", run));
+            .unwrap_or_else(|_| panic!("Failed to run grit (run {})", run));
         assert!(status.success(), "grit sort failed on run {}", run);
     }
 

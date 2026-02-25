@@ -317,7 +317,7 @@ impl ClosestCommand {
                 let dist = (b_rec.start() - a_end + 1) as i64;
 
                 // Check max distance
-                if self.max_distance.is_none_or(|max_d| dist <= max_d as i64) {
+                if self.max_distance.map_or(true, |max_d| dist <= max_d as i64) {
                     min_dist = dist;
                     candidates.push((b_rec, dist));
 
@@ -348,7 +348,7 @@ impl ClosestCommand {
 
                 if self
                     .max_distance
-                    .is_none_or(|max_d| abs_dist <= max_d as i64)
+                    .map_or(true, |max_d| abs_dist <= max_d as i64)
                 {
                     if abs_dist < min_dist.abs() {
                         min_dist = dist;

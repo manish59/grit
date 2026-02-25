@@ -911,9 +911,9 @@ mod tests {
 
         // Verify sorted order
         assert_eq!(lines.len(), 500);
-        for i in 0..500 {
+        for (i, line) in lines.iter().enumerate() {
             let expected = format!("chr1\t{}\t{}", i * 100, i * 100 + 50);
-            assert_eq!(lines[i], expected, "Mismatch at index {}", i);
+            assert_eq!(*line, expected, "Mismatch at index {}", i);
         }
     }
 

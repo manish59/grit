@@ -324,7 +324,7 @@ mod tests {
 
     #[test]
     fn test_interval_ordering() {
-        let mut intervals = vec![
+        let mut intervals = [
             Interval::new("chr2", 100, 200),
             Interval::new("chr1", 200, 300),
             Interval::new("chr1", 100, 200),
