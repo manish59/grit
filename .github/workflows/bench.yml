@@ -60,36 +60,37 @@ jobs:
       - name: Build release
         run: cargo build --release
 
-      - name: Run Criterion benchmarks
-        run: cargo bench --bench intersect --bench merge --bench sort -- --noplot
-
       - name: Compare with bedtools
         run: |
-          echo "## bedtools-rs vs bedtools comparison" >> $GITHUB_STEP_SUMMARY
+          echo "## GRIT vs bedtools comparison" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Sort comparison
           echo "### Sort (100K intervals)" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "bedtools-rs:" >> $GITHUB_STEP_SUMMARY
-          /usr/bin/time -v ./target/release/bedtools-rs sort -i benches/datasets/medium_a.bed > /dev/null 2>&1 || true
+          echo "GRIT:" >> $GITHUB_STEP_SUMMARY
+          /usr/bin/time -f "Time: %E, Memory: %M KB" ./target/release/grit sort -i benches/datasets/medium_a.bed > /dev/null 2>&1 || true
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "bedtools:" >> $GITHUB_STEP_SUMMARY
-          /usr/bin/time -v bedtools sort -i benches/datasets/medium_a.bed > /dev/null 2>&1 || true
+          /usr/bin/time -f "Time: %E, Memory: %M KB" bedtools sort -i benches/datasets/medium_a.bed > /dev/null 2>&1 || true
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
           # Intersect comparison
           echo "### Intersect (100K x 100K intervals)" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "bedtools-rs:" >> $GITHUB_STEP_SUMMARY
-          /usr/bin/time -v ./target/release/bedtools-rs intersect -a benches/datasets/medium_a.bed -b benches/datasets/medium_b.bed > /dev/null 2>&1 || true
+          echo "GRIT:" >> $GITHUB_STEP_SUMMARY
+          /usr/bin/time -f "Time: %E, Memory: %M KB" ./target/release/grit intersect -a benches/datasets/medium_a.bed -b benches/datasets/medium_b.bed > /dev/null 2>&1 || true
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "bedtools:" >> $GITHUB_STEP_SUMMARY
-          /usr/bin/time -v bedtools intersect -a benches/datasets/medium_a.bed -b benches/datasets/medium_b.bed > /dev/null 2>&1 || true
+          /usr/bin/time -f "Time: %E, Memory: %M KB" bedtools intersect -a benches/datasets/medium_a.bed -b benches/datasets/medium_b.bed > /dev/null 2>&1 || true
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload benchmark results
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-results
-          path: target/criterion/
+          # Merge comparison
+          echo "### Merge (100K intervals)" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "GRIT:" >> $GITHUB_STEP_SUMMARY
+          ./target/release/grit sort -i benches/datasets/medium_a.bed | /usr/bin/time -f "Time: %E, Memory: %M KB" ./target/release/grit merge -i - > /dev/null 2>&1 || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "bedtools:" >> $GITHUB_STEP_SUMMARY
+          bedtools sort -i benches/datasets/medium_a.bed | /usr/bin/time -f "Time: %E, Memory: %M KB" bedtools merge -i - > /dev/null 2>&1 || true
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

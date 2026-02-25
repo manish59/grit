@@ -3,7 +3,7 @@
 
 //! GRIT: Genomic Range Interval Toolkit
 //!
-//! Usage: grit <COMMAND> [OPTIONS]
+//! Usage: `grit <COMMAND> [OPTIONS]`
 
 use clap::{Parser, Subcommand};
 use std::io;
