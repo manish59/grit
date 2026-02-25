@@ -4,21 +4,32 @@ GRIT (Genomic Range Interval Toolkit) is a high-performance tool for genomic int
 
 ## 1. Installation
 
+### From crates.io (Recommended)
+
+```bash
+cargo install grit-genomics
+```
+
+### From Homebrew (macOS/Linux)
+
+```bash
+brew install manish59/grit/grit
+```
+
 ### From Source
 
 ```bash
 git clone https://github.com/manish59/grit.git
 cd grit
 cargo build --release
+cargo install --path .
 ```
-
-The binary is located at `target/release/grit`.
 
 ### Verify Installation
 
 ```bash
-./target/release/grit --version
-./target/release/grit --help
+grit --version
+grit --help
 ```
 
 ## 2. Basic Usage
