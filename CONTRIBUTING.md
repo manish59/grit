@@ -18,7 +18,7 @@ Thank you for your interest in contributing to GRIT (Genomic Range Interval Tool
 
 ### Prerequisites
 
-- **Rust 1.82+** (stable) - Check with `rustc --version`
+- **Rust 1.85+** (stable) - Check with `rustc --version`
 - **bedtools** - For benchmark comparisons and SHA256 parity testing
 - **Git** - For version control
 

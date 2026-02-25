@@ -18,10 +18,10 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - rust >=1.82
+    - rust >=1.85
     - cargo
   host:
-    - rust >=1.82
+    - rust >=1.85
   run: []
 
 test:
