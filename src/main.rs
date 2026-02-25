@@ -10,8 +10,8 @@ use std::io;
 use std::path::PathBuf;
 use std::process;
 
-use grit::bed::{BedError, BedReader};
-use grit::commands::{
+use grit_genomics::bed::{BedError, BedReader};
+use grit_genomics::commands::{
     verify_sorted, verify_sorted_reader, verify_sorted_with_genome, ClosestCommand,
     ComplementCommand, FastMergeCommand, FastSortCommand, GenomecovCommand, GenomecovOutputMode,
     IntersectCommand, JaccardCommand, MergeCommand, MultiinterCommand, SlopCommand, SortCommand,
@@ -19,7 +19,7 @@ use grit::commands::{
     StreamingGenomecovMode, StreamingIntersectCommand, StreamingMultiinterCommand,
     StreamingSubtractCommand, StreamingWindowCommand, SubtractCommand,
 };
-use grit::genome::Genome;
+use grit_genomics::genome::Genome;
 
 #[derive(Parser)]
 #[command(name = "grit")]
@@ -523,7 +523,7 @@ fn main() {
     // Configure bedtools-compatible mode if requested
     // This must be set before any parsing occurs
     if cli.bedtools_compatible {
-        grit::config::set_bedtools_compatible(true);
+        grit_genomics::config::set_bedtools_compatible(true);
     }
 
     // Configure thread pool if --threads specified
@@ -896,7 +896,7 @@ fn run_merge(
         }
     } else if strand {
         // Strand-specific merge not yet implemented in fast path, use standard streaming
-        use grit::commands::StreamingMergeCommand;
+        use grit_genomics::commands::StreamingMergeCommand;
         let mut cmd = StreamingMergeCommand::new()
             .with_distance(distance)
             .with_strand(strand);
@@ -1353,7 +1353,7 @@ fn run_closest(
             })?;
         }
 
-        use grit::commands::closest::TieHandling;
+        use grit_genomics::commands::closest::TieHandling;
 
         let mut cmd = ClosestCommand::new();
         cmd.report_distance = _distance;
@@ -1631,7 +1631,7 @@ fn run_generate(
     len_max: u32,
     force: bool,
 ) -> Result<(), BedError> {
-    use grit::commands::generate::{
+    use grit_genomics::commands::generate::{
         GenerateCommand, GenerateConfig, GenerateMode, SizeSpec, SortMode,
     };
 

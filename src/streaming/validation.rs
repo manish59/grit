@@ -23,7 +23,7 @@ use std::path::Path;
 /// # Example
 ///
 /// ```rust,no_run
-/// use grit::streaming::verify_sorted;
+/// use grit_genomics::streaming::verify_sorted;
 ///
 /// verify_sorted("input.bed").expect("File must be sorted");
 /// ```

@@ -16,7 +16,7 @@
 //! # Example
 //!
 //! ```rust,no_run
-//! use grit::{bed, interval::Interval, commands::IntersectCommand};
+//! use grit_genomics::{bed, interval::Interval, commands::IntersectCommand};
 //!
 //! // Read BED files
 //! let a = bed::read_intervals("a.bed").unwrap();

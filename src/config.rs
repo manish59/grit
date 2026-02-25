@@ -23,7 +23,7 @@ static BEDTOOLS_COMPATIBLE: AtomicBool = AtomicBool::new(false);
 /// # Example
 ///
 /// ```
-/// use grit::config;
+/// use grit_genomics::config;
 ///
 /// // Enable at startup before any parsing
 /// config::set_bedtools_compatible(true);
