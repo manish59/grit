@@ -1,6 +1,6 @@
 # GRIT: Genomic Range Interval Toolkit
 
-A high-performance genomic interval toolkit written in Rust. Drop-in replacement for bedtools with **2.8-8.3x faster** performance.
+A high-performance genomic interval toolkit written in Rust. Drop-in replacement for bedtools with **3-15x faster** performance.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Crates.io](https://img.shields.io/crates/v/grit-genomics.svg)](https://crates.io/crates/grit-genomics)
@@ -46,7 +46,7 @@ A high-performance genomic interval toolkit written in Rust. Drop-in replacement
 
 | Feature | bedtools | GRIT |
 |---------|----------|------|
-| Speed | Baseline | **2.8-8.3x faster** |
+| Speed | Baseline | **3-15x faster** |
 | Memory (streaming) | N/A | **O(k) constant** |
 | Parallelization | Single-threaded | Multi-core |
 | Large file support | Limited by RAM | Process 50GB+ on 4GB RAM |
@@ -219,9 +219,9 @@ Find overlapping intervals between two BED files.
 
 #### Why Use GRIT
 
-- **2.8x faster** than bedtools intersect
-- **3.7x faster** with streaming mode
+- **4.4x faster** than bedtools intersect
 - **O(k) memory** in streaming mode (k = max concurrent overlaps)
+- **19x less memory** than bedtools
 
 #### How to Use
 
@@ -304,8 +304,8 @@ Remove portions of A that overlap with B.
 
 #### Why Use GRIT
 
-- **6.6x faster** than bedtools subtract
-- Streaming mode for large files
+- **6.5x faster** than bedtools subtract
+- **19x less memory** in streaming mode
 - Precise interval arithmetic
 
 #### How to Use
@@ -362,8 +362,8 @@ Combine overlapping and adjacent intervals into single intervals.
 
 #### Why Use GRIT
 
-- **7.3x faster** than bedtools merge
-- **2 MB memory** regardless of file size
+- **10.8x faster** than bedtools merge
+- **~3 MB memory** regardless of file size
 - Streaming by default (no `--streaming` flag needed)
 
 #### How to Use
@@ -618,8 +618,8 @@ Calculate coverage depth of B intervals over A intervals.
 
 #### Why Use GRIT
 
-- **8.3x faster** than bedtools coverage
-- Memory-efficient O(B) algorithm
+- **9x faster** than bedtools coverage
+- **134x less memory** than bedtools
 - Multiple output formats (counts, histogram, per-base)
 
 #### How to Use
@@ -1244,16 +1244,19 @@ The `--bedtools-compatible` flag has **negligible performance impact** (<1%). No
 
 ### Benchmarks
 
-Tested on 500K intervals per file (AMD Ryzen 9, 32GB RAM):
+Tested on 10M × 5M intervals (uniform distribution):
 
-| Command | bedtools | GRIT | Speedup |
-|---------|----------|------|---------|
-| intersect | 0.67s | 0.24s | **2.8x** |
-| intersect --streaming | - | 0.18s | **3.7x** |
-| subtract | 1.46s | 0.22s | **6.6x** |
-| merge | 0.29s | 0.04s | **7.3x** |
-| coverage | 2.08s | 0.25s | **8.3x** |
-| closest | 0.53s | 0.50s | **1.1x** |
+| Command | bedtools | GRIT | Speedup | Memory Reduction |
+|---------|----------|------|---------|------------------|
+| window | 32.18s | 2.10s | **15.3x** | 137x less |
+| merge | 3.68s | 0.34s | **10.8x** | ~same |
+| coverage | 16.53s | 1.84s | **9.0x** | 134x less |
+| subtract | 9.49s | 1.47s | **6.5x** | 19x less |
+| closest | 9.70s | 1.95s | **5.0x** | 59x less |
+| intersect | 6.77s | 1.54s | **4.4x** | 19x less |
+| jaccard | 4.98s | 1.59s | **3.1x** | 1230x less |
+
+See [full benchmark methodology](https://manish59.github.io/grit/benchmarks.html) for details.
 
 ### Performance Tips
 
