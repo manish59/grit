@@ -93,6 +93,13 @@ Tested on 10M × 5M intervals ([full methodology](benchmarks.html)):
 
 See [detailed benchmarks](benchmarks.html) for methodology and reproducibility instructions.
 
+## Guides
+
+- [Migrating from bedtools](migration.html) - Drop-in replacement guide
+- [Input Validation](VALIDATION.html) - Sort order & genome validation
+- [Streaming Model](STREAMING_MODEL.html) - O(k) memory algorithms
+- [Architecture](ARCHITECTURE.html) - Internal design
+
 ## Links
 
 - [GitHub Repository](https://github.com/manish59/grit)
