@@ -1,8 +1,8 @@
 class Grit < Formula
   desc "GRIT: Genomic Range Interval Toolkit - high-performance BED file operations"
   homepage "https://github.com/manish59/grit"
-  url "https://github.com/manish59/grit/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "e428b1fbebccf5974e1daa5af0a53daac0a49e3c33aef33861582c3ba3bdaa9d"
+  url "https://github.com/manish59/grit/archive/refs/tags/v0.1.1.tar.gz"
+  sha256 "40c0ad8652a05056aa8eac7662c23d68e67a86343ef588b397f46221c840121d"
   license "MIT"
   head "https://github.com/manish59/grit.git", branch: "main"
 

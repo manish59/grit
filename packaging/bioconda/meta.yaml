@@ -1,5 +1,5 @@
 {% set name = "grit-genomics" %}
-{% set version = "0.1.0" %}
+{% set version = "0.1.1" %}
 
 package:
   name: {{ name }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/manish59/grit/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: e428b1fbebccf5974e1daa5af0a53daac0a49e3c33aef33861582c3ba3bdaa9d
+  sha256: 40c0ad8652a05056aa8eac7662c23d68e67a86343ef588b397f46221c840121d
 
 build:
   number: 0
