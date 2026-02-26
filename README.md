@@ -21,6 +21,36 @@ A high-performance genomic interval toolkit written in Rust. Drop-in replacement
 
 ---
 
+## Benchmarks
+
+Tested on 10M × 5M intervals ([full methodology](https://manish59.github.io/grit/benchmarks.html)):
+
+### Uniform Distribution
+
+| Command | bedtools | GRIT | Speedup | BT Memory | GRIT Memory | Reduction |
+|---------|----------|------|---------|-----------|-------------|-----------|
+| window | 32.18s | 2.10s | **15.3x** | 1.5 GB | 11 MB | 137x less |
+| merge | 3.68s | 0.34s | **10.8x** | 2.6 MB | 2.8 MB | ~same |
+| coverage | 16.53s | 1.84s | **9.0x** | 1.4 GB | 11 MB | 134x less |
+| subtract | 9.49s | 1.47s | **6.5x** | 208 MB | 11 MB | 19x less |
+| closest | 9.70s | 1.95s | **5.0x** | 670 MB | 11 MB | 59x less |
+| intersect | 6.77s | 1.54s | **4.4x** | 208 MB | 11 MB | 19x less |
+| jaccard | 4.98s | 1.59s | **3.1x** | 3.4 GB | 2.8 MB | 1230x less |
+
+### Clustered Distribution (Real-world hotspots)
+
+| Command | bedtools | GRIT | Speedup | BT Memory | GRIT Memory |
+|---------|----------|------|---------|-----------|-------------|
+| window | 28.80s | 1.97s | **14.6x** | 1.4 GB | 12 MB |
+| subtract | 14.72s | 1.22s | **12.1x** | 1.3 GB | 11 MB |
+| coverage | 14.59s | 1.50s | **9.7x** | 1.4 GB | 11 MB |
+| merge | 2.17s | 0.31s | **7.0x** | 55 MB | 2.8 MB |
+| closest | 9.51s | 1.80s | **5.3x** | 583 MB | 12 MB |
+| intersect | 6.27s | 1.44s | **4.4x** | 207 MB | 11 MB |
+| jaccard | 4.51s | 1.95s | **2.3x** | 3.4 GB | 3.4 MB |
+
+---
+
 ## Installation
 
 ```bash
