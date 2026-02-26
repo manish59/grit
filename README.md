@@ -53,14 +53,31 @@ Tested on 10M × 5M intervals ([full methodology](https://manish59.github.io/gri
 
 ## Installation
 
+### Bioconda (Recommended for Python users)
+
 ```bash
-# From crates.io (recommended)
-cargo install grit-genomics
+conda install -c bioconda grit-genomics
+```
 
-# From Homebrew (macOS/Linux)
+### Homebrew (macOS/Linux)
+
+```bash
 brew install manish59/grit/grit
+```
 
-# From source
+### Cargo (Rust users)
+
+```bash
+cargo install grit-genomics
+```
+
+### Pre-built Binaries
+
+Download from [GitHub Releases](https://github.com/manish59/grit/releases) for Linux (x86_64, ARM64) and macOS (x86_64, ARM64).
+
+### From Source
+
+```bash
 git clone https://github.com/manish59/grit && cd grit && cargo install --path .
 ```
 
