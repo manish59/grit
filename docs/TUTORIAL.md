@@ -1,3 +1,9 @@
+---
+layout: default
+title: Tutorial
+nav_exclude: true
+---
+
 # GRIT Tutorial
 
 GRIT (Genomic Range Interval Toolkit) is a high-performance tool for genomic interval operations. This tutorial covers installation, basic usage, and advanced features.

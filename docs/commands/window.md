@@ -1,6 +1,8 @@
 ---
 layout: default
-title: window - GRIT Documentation
+title: window
+parent: Commands
+nav_order: 6
 ---
 
 # grit window

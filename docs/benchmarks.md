@@ -1,6 +1,7 @@
 ---
 layout: default
-title: Benchmarks - GRIT
+title: Benchmarks
+nav_order: 2
 ---
 
 # Benchmarks

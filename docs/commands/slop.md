@@ -1,6 +1,8 @@
 ---
 layout: default
-title: slop - GRIT Documentation
+title: slop
+parent: Commands
+nav_order: 8
 ---
 
 # grit slop

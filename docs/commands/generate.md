@@ -1,6 +1,8 @@
 ---
 layout: default
-title: generate - GRIT Documentation
+title: generate
+parent: Commands
+nav_order: 13
 ---
 
 # grit generate

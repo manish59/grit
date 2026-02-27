@@ -1,6 +1,8 @@
 ---
 layout: default
-title: jaccard - GRIT Documentation
+title: jaccard
+parent: Commands
+nav_order: 11
 ---
 
 # grit jaccard

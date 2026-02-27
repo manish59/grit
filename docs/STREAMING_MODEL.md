@@ -1,3 +1,9 @@
+---
+layout: default
+title: Streaming Model
+nav_order: 5
+---
+
 # GRIT Streaming Model
 
 This document describes GRIT's streaming algorithms and their memory guarantees.

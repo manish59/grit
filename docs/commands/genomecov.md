@@ -1,6 +1,8 @@
 ---
 layout: default
-title: genomecov - GRIT Documentation
+title: genomecov
+parent: Commands
+nav_order: 10
 ---
 
 # grit genomecov

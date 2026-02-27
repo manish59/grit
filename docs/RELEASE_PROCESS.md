@@ -1,3 +1,9 @@
+---
+layout: default
+title: Release Process
+nav_exclude: true
+---
+
 # GRIT Release Process
 
 This document describes the release process for GRIT.

@@ -1,6 +1,8 @@
 ---
 layout: default
-title: subtract - GRIT Documentation
+title: subtract
+parent: Commands
+nav_order: 4
 ---
 
 # grit subtract

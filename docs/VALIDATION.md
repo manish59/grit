@@ -1,3 +1,9 @@
+---
+layout: default
+title: Input Validation
+nav_order: 4
+---
+
 # GRIT Input Validation
 
 This document describes GRIT's input validation system and how to control it.

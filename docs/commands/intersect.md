@@ -1,6 +1,8 @@
 ---
 layout: default
-title: intersect - GRIT Documentation
+title: intersect
+parent: Commands
+nav_order: 3
 ---
 
 # grit intersect

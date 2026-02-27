@@ -1,6 +1,8 @@
 ---
 layout: default
-title: GRIT - Genomic Range Interval Toolkit
+title: Home
+nav_order: 1
+permalink: /
 ---
 
 # GRIT Documentation

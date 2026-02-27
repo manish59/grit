@@ -1,6 +1,8 @@
 ---
 layout: default
-title: multiinter - GRIT Documentation
+title: multiinter
+parent: Commands
+nav_order: 12
 ---
 
 # grit multiinter

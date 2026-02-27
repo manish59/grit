@@ -1,6 +1,7 @@
 ---
 layout: default
-title: Migrating from bedtools
+title: Migration from bedtools
+nav_order: 3
 ---
 
 # Migrating from bedtools

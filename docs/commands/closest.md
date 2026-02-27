@@ -1,6 +1,8 @@
 ---
 layout: default
-title: closest - GRIT Documentation
+title: closest
+parent: Commands
+nav_order: 5
 ---
 
 # grit closest

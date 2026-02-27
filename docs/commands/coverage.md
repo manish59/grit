@@ -1,6 +1,8 @@
 ---
 layout: default
-title: coverage - GRIT Documentation
+title: coverage
+parent: Commands
+nav_order: 7
 ---
 
 # grit coverage

@@ -1,7 +1,35 @@
 title: GRIT Documentation
 description: Genomic Range Interval Toolkit - High-performance BED file operations
-remote_theme: pages-themes/minimal@v0.2.0
+remote_theme: just-the-docs/just-the-docs@v0.10.0
 plugins:
   - jekyll-remote-theme
 
-show_downloads: false
+color_scheme: light
+
+# Footer content
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub"
+gh_edit_repository: "https://github.com/manish59/grit"
+gh_edit_branch: "main"
+gh_edit_source: docs
+gh_edit_view_source: false
+
+# Aux links (top right)
+aux_links:
+  "GitHub":
+    - "https://github.com/manish59/grit"
+  "crates.io":
+    - "https://crates.io/crates/grit-genomics"
+
+# Enable heading anchors
+heading_anchors: true
+
+# Enable copy button on code blocks
+enable_copy_code_button: true
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "Back to top"
+
+# Navigation structure
+nav_enabled: true

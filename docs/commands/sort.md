@@ -1,6 +1,8 @@
 ---
 layout: default
-title: sort - GRIT Documentation
+title: sort
+parent: Commands
+nav_order: 1
 ---
 
 # grit sort

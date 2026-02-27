@@ -1,3 +1,10 @@
+---
+layout: default
+title: Commands
+nav_order: 7
+has_children: true
+---
+
 # GRIT Command Reference
 
 GRIT: Genomic Range Interval Toolkit - High-performance genomic interval operations.

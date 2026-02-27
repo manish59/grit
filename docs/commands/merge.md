@@ -1,6 +1,8 @@
 ---
 layout: default
-title: merge - GRIT Documentation
+title: merge
+parent: Commands
+nav_order: 2
 ---
 
 # grit merge

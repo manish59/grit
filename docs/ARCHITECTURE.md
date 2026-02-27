@@ -1,3 +1,9 @@
+---
+layout: default
+title: Architecture
+nav_order: 6
+---
+
 # GRIT Architecture
 
 This document describes the high-level architecture and design decisions in GRIT.
