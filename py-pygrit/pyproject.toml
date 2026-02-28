@@ -3,16 +3,16 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "rbedtools"
+name = "pygrit"
 version = "0.1.0"
-description = "Fast, parallel genomic interval operations in Rust with Python bindings"
+description = "Python bindings for GRIT - high-performance genomic interval operations"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
     { name = "Manish Kumar Bobbili" }
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -20,10 +20,13 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Rust",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
 ]
-keywords = ["bioinformatics", "genomics", "bedtools", "intervals", "rbedtools"]
+keywords = ["bioinformatics", "genomics", "bedtools", "intervals", "grit", "pygrit"]
 requires-python = ">=3.9"
 dependencies = [
     "numpy>=1.20",
@@ -33,13 +36,15 @@ dependencies = [
 dev = [
     "pytest>=7.0",
     "pytest-benchmark>=4.0",
+    "mypy>=1.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/manishkumarbobbili/rbedtools"
-Repository = "https://github.com/manishkumarbobbili/rbedtools"
+Homepage = "https://github.com/manish59/grit"
+Repository = "https://github.com/manish59/grit"
+Documentation = "https://grit-genomics.readthedocs.io"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
 python-source = "python"
-module-name = "rbedtools"
+module-name = "pygrit"
