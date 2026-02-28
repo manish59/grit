@@ -23,9 +23,57 @@ A high-performance genomic interval toolkit written in Rust. Drop-in replacement
 
 ## Benchmarks
 
-Tested on 10M × 5M intervals ([full methodology](https://manish59.github.io/grit/benchmarks.html)):
+### Multi-Tool Comparison (100M × 10M intervals)
 
-### Uniform Distribution
+Comparison against bedtools and bedops on 100 million intervals:
+
+| Command | GRIT | bedtools | bedops | GRIT Speedup |
+|---------|-----:|--------:|-------:|-------------:|
+| **intersect** | **13.2s** | 1m 35s | 28.1s | **7.2x** |
+| **merge** | **2.6s** | 28.8s | 21.7s | **11.0x** |
+| **subtract** | **10.3s** | 1m 11s | 27.7s | **6.9x** |
+| **closest** | **17.1s** | 1m 58s | 1m 10s | **6.9x** |
+
+#### Memory Usage at 100M Scale
+
+| Command | GRIT | bedtools | bedops | GRIT Reduction |
+|---------|-----:|--------:|-------:|---------------:|
+| **intersect** | **12 MB** | 1,790 MB | 10 MB | **148x less** |
+| **subtract** | **11 MB** | 1,790 MB | 10 MB | **160x less** |
+| **closest** | **12 MB** | 3,720 MB | 10 MB | **310x less** |
+
+### Scaling Performance
+
+| Dataset | intersect | merge | subtract | closest | Avg Speedup |
+|---------|-----------|-------|----------|---------|-------------|
+| 10M × 5M | 4.3x | 6.5x | 6.3x | 5.1x | **5.5x** |
+| 50M × 5M | 6.6x | 10.6x | 7.1x | 7.0x | **7.8x** |
+| 100M × 10M | 7.2x | 11.0x | 6.9x | 6.9x | **8.0x** |
+
+<details>
+<summary><strong>Commands Used for Benchmarking</strong></summary>
+
+```bash
+# GRIT: O(k) streaming mode
+grit intersect -a A.bed -b B.bed --streaming --assume-sorted
+grit merge -i A.bed --assume-sorted
+
+# bedtools: -sorted flag for streaming
+bedtools intersect -a A.bed -b B.bed -sorted
+bedtools merge -i A.bed
+
+# bedops: requires pre-sorted input
+bedops --intersect A.bed B.bed
+bedops --merge A.bed
+```
+
+</details>
+
+### GRIT vs bedtools (10M × 5M)
+
+Full methodology: [benchmarks documentation](https://manish59.github.io/grit/benchmarks.html)
+
+#### Uniform Distribution
 
 | Command | bedtools | GRIT | Speedup | BT Memory | GRIT Memory | Reduction |
 |---------|----------|------|---------|-----------|-------------|-----------|
@@ -37,7 +85,7 @@ Tested on 10M × 5M intervals ([full methodology](https://manish59.github.io/gri
 | intersect | 6.77s | 1.54s | **4.4x** | 208 MB | 11 MB | 19x less |
 | jaccard | 4.98s | 1.59s | **3.1x** | 3.4 GB | 2.8 MB | 1230x less |
 
-### Clustered Distribution (Real-world hotspots)
+#### Clustered Distribution (Real-world hotspots)
 
 | Command | bedtools | GRIT | Speedup | BT Memory | GRIT Memory |
 |---------|----------|------|---------|-----------|-------------|
