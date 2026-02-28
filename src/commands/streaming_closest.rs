@@ -724,4 +724,215 @@ mod tests {
         assert_eq!(parse_u64_fast(b"0"), Some(0));
         assert_eq!(parse_u64_fast(b""), None);
     }
+
+    // =============================================================================
+    // Flag combination unit tests
+    // =============================================================================
+
+    #[test]
+    fn test_ignore_overlaps_flag() {
+        // A overlaps B1, B2 is downstream
+        let a_file = create_temp_bed("chr1\t100\t200\n");
+        let b_file = create_temp_bed("chr1\t150\t250\nchr1\t300\t400\n");
+
+        let mut cmd = StreamingClosestCommand::new();
+        cmd.ignore_overlaps = true;
+
+        let mut output = Vec::new();
+        cmd.run(a_file.path(), b_file.path(), &mut output).unwrap();
+
+        let result = String::from_utf8(output).unwrap();
+        assert!(
+            result.contains("300\t400"),
+            "Should find non-overlapping B2: {}",
+            result
+        );
+        assert!(
+            !result.contains("150\t250"),
+            "Should skip overlapping B1: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_ignore_upstream_flag() {
+        // A at 200-300, B1 upstream, B2 downstream
+        let a_file = create_temp_bed("chr1\t200\t300\n");
+        let b_file = create_temp_bed("chr1\t100\t150\nchr1\t350\t400\n");
+
+        let mut cmd = StreamingClosestCommand::new();
+        cmd.ignore_upstream = true;
+
+        let mut output = Vec::new();
+        cmd.run(a_file.path(), b_file.path(), &mut output).unwrap();
+
+        let result = String::from_utf8(output).unwrap();
+        assert!(
+            result.contains("350\t400"),
+            "Should find downstream B2: {}",
+            result
+        );
+        assert!(
+            !result.contains("100\t150"),
+            "Should skip upstream B1: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_ignore_downstream_flag() {
+        // A at 200-300, B1 upstream, B2 downstream
+        let a_file = create_temp_bed("chr1\t200\t300\n");
+        let b_file = create_temp_bed("chr1\t100\t150\nchr1\t350\t400\n");
+
+        let mut cmd = StreamingClosestCommand::new();
+        cmd.ignore_downstream = true;
+
+        let mut output = Vec::new();
+        cmd.run(a_file.path(), b_file.path(), &mut output).unwrap();
+
+        let result = String::from_utf8(output).unwrap();
+        assert!(
+            result.contains("100\t150"),
+            "Should find upstream B1: {}",
+            result
+        );
+        assert!(
+            !result.contains("350\t400"),
+            "Should skip downstream B2: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_ignore_overlaps_and_upstream() {
+        // Only downstream non-overlapping should match
+        let a_file = create_temp_bed("chr1\t100\t200\n");
+        let b_file = create_temp_bed("chr1\t50\t80\nchr1\t150\t250\nchr1\t300\t400\n");
+
+        let mut cmd = StreamingClosestCommand::new();
+        cmd.ignore_overlaps = true;
+        cmd.ignore_upstream = true;
+
+        let mut output = Vec::new();
+        cmd.run(a_file.path(), b_file.path(), &mut output).unwrap();
+
+        let result = String::from_utf8(output).unwrap();
+        assert!(
+            result.contains("300\t400"),
+            "Should find downstream B3: {}",
+            result
+        );
+        assert!(
+            !result.contains("50\t80"),
+            "Should skip upstream: {}",
+            result
+        );
+        assert!(
+            !result.contains("150\t250"),
+            "Should skip overlapping: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_ignore_overlaps_and_downstream() {
+        // Only upstream non-overlapping should match
+        let a_file = create_temp_bed("chr1\t100\t200\n");
+        let b_file = create_temp_bed("chr1\t50\t80\nchr1\t150\t250\nchr1\t300\t400\n");
+
+        let mut cmd = StreamingClosestCommand::new();
+        cmd.ignore_overlaps = true;
+        cmd.ignore_downstream = true;
+
+        let mut output = Vec::new();
+        cmd.run(a_file.path(), b_file.path(), &mut output).unwrap();
+
+        let result = String::from_utf8(output).unwrap();
+        assert!(
+            result.contains("50\t80"),
+            "Should find upstream B2: {}",
+            result
+        );
+        assert!(
+            !result.contains("300\t400"),
+            "Should skip downstream: {}",
+            result
+        );
+        assert!(
+            !result.contains("150\t250"),
+            "Should skip overlapping: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_ignore_upstream_and_downstream() {
+        // Only overlapping should match
+        let a_file = create_temp_bed("chr1\t100\t200\n");
+        let b_file = create_temp_bed("chr1\t50\t80\nchr1\t150\t250\nchr1\t300\t400\n");
+
+        let mut cmd = StreamingClosestCommand::new();
+        cmd.ignore_upstream = true;
+        cmd.ignore_downstream = true;
+
+        let mut output = Vec::new();
+        cmd.run(a_file.path(), b_file.path(), &mut output).unwrap();
+
+        let result = String::from_utf8(output).unwrap();
+        assert!(
+            result.contains("150\t250"),
+            "Should find overlapping B1: {}",
+            result
+        );
+        assert!(
+            !result.contains("50\t80"),
+            "Should skip upstream: {}",
+            result
+        );
+        assert!(
+            !result.contains("300\t400"),
+            "Should skip downstream: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_ignore_all_flags() {
+        // No matches possible
+        let a_file = create_temp_bed("chr1\t100\t200\n");
+        let b_file = create_temp_bed("chr1\t50\t80\nchr1\t150\t250\nchr1\t300\t400\n");
+
+        let mut cmd = StreamingClosestCommand::new();
+        cmd.ignore_overlaps = true;
+        cmd.ignore_upstream = true;
+        cmd.ignore_downstream = true;
+
+        let mut output = Vec::new();
+        cmd.run(a_file.path(), b_file.path(), &mut output).unwrap();
+
+        let result = String::from_utf8(output).unwrap();
+        assert!(
+            result.contains(".\t-1\t-1"),
+            "Should report no closest: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_report_first_tie_only() {
+        // Equidistant B intervals
+        let a_file = create_temp_bed("chr1\t200\t300\n");
+        let b_file = create_temp_bed("chr1\t100\t150\nchr1\t350\t400\n");
+
+        let mut cmd = StreamingClosestCommand::new();
+        cmd.report_all_ties = false;
+
+        let mut output = Vec::new();
+        cmd.run(a_file.path(), b_file.path(), &mut output).unwrap();
+
+        let result = String::from_utf8(output).unwrap();
+        let lines: Vec<_> = result.lines().collect();
+        assert_eq!(lines.len(), 1, "Should report only first tie: {}", result);
+    }
 }
