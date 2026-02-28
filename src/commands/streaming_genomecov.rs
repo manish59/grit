@@ -18,6 +18,7 @@
 
 use crate::bed::BedError;
 use crate::genome::Genome;
+use crate::streaming::buffers::{DEFAULT_INPUT_BUFFER, DEFAULT_OUTPUT_BUFFER};
 use crate::streaming::parsing::{parse_bed3_bytes, should_skip_line};
 use std::collections::HashMap;
 use std::fs::File;
@@ -94,7 +95,7 @@ impl StreamingGenomecovCommand {
         output: &mut W,
     ) -> Result<(), BedError> {
         let file = File::open(input)?;
-        let reader = BufReader::with_capacity(256 * 1024, file);
+        let reader = BufReader::with_capacity(DEFAULT_INPUT_BUFFER, file);
         self.genomecov_streaming(reader, genome, output)
     }
 
@@ -117,7 +118,7 @@ impl StreamingGenomecovCommand {
         output: &mut W,
     ) -> Result<(), BedError> {
         // Large output buffer (8MB)
-        let mut buf_output = BufWriter::with_capacity(8 * 1024 * 1024, output);
+        let mut buf_output = BufWriter::with_capacity(DEFAULT_OUTPUT_BUFFER, output);
 
         // Get genome chromosomes info
         let chroms: Vec<&String> = genome.chromosomes().collect();

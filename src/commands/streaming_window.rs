@@ -16,6 +16,7 @@
 //! Both input files MUST be sorted by chromosome (lexicographic), then by start position.
 
 use crate::bed::BedError;
+use crate::streaming::buffers::{DEFAULT_INPUT_BUFFER, DEFAULT_OUTPUT_BUFFER};
 use crate::streaming::parsing::{parse_bed3_bytes, should_skip_line};
 use std::collections::HashSet;
 use std::fs::File;
@@ -84,15 +85,15 @@ impl StreamingWindowCommand {
         b_path: P,
         output: &mut W,
     ) -> Result<StreamingWindowStats, BedError> {
-        // Large output buffer (8MB)
-        let mut output = BufWriter::with_capacity(8 * 1024 * 1024, output);
+        // Output buffer (2MB default, reduced from 8MB for memory efficiency)
+        let mut output = BufWriter::with_capacity(DEFAULT_OUTPUT_BUFFER, output);
 
-        // Stream files with large buffers
+        // Stream files
         let a_file = File::open(a_path.as_ref())?;
-        let mut a_reader = BufReader::with_capacity(256 * 1024, a_file);
+        let mut a_reader = BufReader::with_capacity(DEFAULT_INPUT_BUFFER, a_file);
 
         let b_file = File::open(b_path.as_ref())?;
-        let mut b_reader = BufReader::with_capacity(256 * 1024, b_file);
+        let mut b_reader = BufReader::with_capacity(DEFAULT_INPUT_BUFFER, b_file);
 
         // Reusable line buffers
         let mut a_line_buf = String::with_capacity(1024);

@@ -13,6 +13,7 @@
 //! Use `--assume-sorted` flag or pre-sort with `grit sort`.
 
 use crate::bed::BedError;
+use crate::streaming::buffers::{DEFAULT_INPUT_BUFFER, DEFAULT_OUTPUT_BUFFER};
 use crate::streaming::parsing::{parse_bed3_bytes, should_skip_line};
 use crate::streaming::ActiveInterval;
 use std::fs::File;
@@ -61,16 +62,16 @@ impl StreamingCoverageCommand {
         b_path: P,
         output: &mut W,
     ) -> Result<(), BedError> {
-        // Large output buffer (8MB)
-        let mut output = BufWriter::with_capacity(8 * 1024 * 1024, output);
+        // Output buffer (2MB default, reduced from 8MB for memory efficiency)
+        let mut output = BufWriter::with_capacity(DEFAULT_OUTPUT_BUFFER, output);
 
         // Stream A file
         let a_file = File::open(&a_path)?;
-        let mut a_reader = BufReader::with_capacity(256 * 1024, a_file);
+        let mut a_reader = BufReader::with_capacity(DEFAULT_INPUT_BUFFER, a_file);
 
         // Stream B file
         let b_file = File::open(&b_path)?;
-        let mut b_reader = BufReader::with_capacity(256 * 1024, b_file);
+        let mut b_reader = BufReader::with_capacity(DEFAULT_INPUT_BUFFER, b_file);
 
         // Reusable line buffers (no per-line allocation)
         let mut a_line_buf = String::with_capacity(1024);

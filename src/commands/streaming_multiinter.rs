@@ -12,6 +12,7 @@
 #![allow(clippy::ptr_arg)]
 
 use crate::bed::BedError;
+use crate::streaming::buffers::{DEFAULT_INPUT_BUFFER, DEFAULT_OUTPUT_BUFFER};
 use crate::streaming::parsing::{parse_bed3_bytes, should_skip_line};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
@@ -180,7 +181,7 @@ impl StreamingMultiinterCommand {
         let mut readers = Vec::with_capacity(inputs.len());
         for (idx, path) in inputs.iter().enumerate() {
             let file = File::open(path)?;
-            let reader = BufReader::with_capacity(256 * 1024, file);
+            let reader = BufReader::with_capacity(DEFAULT_INPUT_BUFFER, file);
             readers.push(FileReader::new(reader, idx));
         }
 
@@ -203,7 +204,7 @@ impl StreamingMultiinterCommand {
         output: &mut W,
     ) -> Result<(), BedError> {
         // Large output buffer (8MB)
-        let mut buf_output = BufWriter::with_capacity(8 * 1024 * 1024, output);
+        let mut buf_output = BufWriter::with_capacity(DEFAULT_OUTPUT_BUFFER, output);
 
         // Initialize min-heap with first interval from each file
         let mut heap: BinaryHeap<HeapEntry> = BinaryHeap::with_capacity(n_files);
