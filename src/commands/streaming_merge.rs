@@ -365,7 +365,9 @@ mod tests {
     fn make_bed6_content(intervals: &[(&str, u64, u64, &str, &str, &str)]) -> String {
         intervals
             .iter()
-            .map(|(c, s, e, name, score, strand)| format!("{}\t{}\t{}\t{}\t{}\t{}", c, s, e, name, score, strand))
+            .map(|(c, s, e, name, score, strand)| {
+                format!("{}\t{}\t{}\t{}\t{}\t{}", c, s, e, name, score, strand)
+            })
             .collect::<Vec<_>>()
             .join("\n")
     }
@@ -412,7 +414,12 @@ mod tests {
         let result = String::from_utf8(output).unwrap();
         let lines: Vec<_> = result.lines().collect();
 
-        assert_eq!(lines.len(), 2, "Different strands should not merge: {}", result);
+        assert_eq!(
+            lines.len(),
+            2,
+            "Different strands should not merge: {}",
+            result
+        );
     }
 
     #[test]
@@ -435,7 +442,12 @@ mod tests {
         let result = String::from_utf8(output).unwrap();
         let lines: Vec<_> = result.lines().collect();
 
-        assert_eq!(lines.len(), 1, "Same strand within distance should merge: {}", result);
+        assert_eq!(
+            lines.len(),
+            1,
+            "Same strand within distance should merge: {}",
+            result
+        );
     }
 
     #[test]
@@ -459,16 +471,18 @@ mod tests {
         let result = String::from_utf8(output).unwrap();
         let lines: Vec<_> = result.lines().collect();
 
-        assert_eq!(lines.len(), 2, "Should produce 2 merged intervals: {}", result);
+        assert_eq!(
+            lines.len(),
+            2,
+            "Should produce 2 merged intervals: {}",
+            result
+        );
     }
 
     #[test]
     fn test_streaming_merge_no_strand_column() {
         // Test with strand_specific but no strand column (should use default)
-        let content = make_bed_content(&[
-            ("chr1", 100, 200),
-            ("chr1", 150, 250),
-        ]);
+        let content = make_bed_content(&[("chr1", 100, 200), ("chr1", 150, 250)]);
 
         let mut cmd = StreamingMergeCommand::new();
         cmd.strand_specific = true;

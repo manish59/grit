@@ -491,7 +491,7 @@ fn test_intersect_fraction_100_percent() {
     // Both should match since A is 100% covered by both B intervals
     let lines: Vec<_> = result.lines().collect();
     assert!(
-        lines.len() >= 1,
+        !lines.is_empty(),
         "Should find at least one 100% overlap: {}",
         result
     );
@@ -518,7 +518,11 @@ fn test_intersect_fraction_reciprocal() {
 
     assert!(is_success(&output));
     let result = stdout(&output);
-    assert!(!result.is_empty(), "Should find reciprocal overlap: {}", result);
+    assert!(
+        !result.is_empty(),
+        "Should find reciprocal overlap: {}",
+        result
+    );
 }
 
 /// Test -f with -r where one side doesn't meet requirement
@@ -630,8 +634,16 @@ fn test_intersect_wa_wb() {
 
     assert!(is_success(&output));
     let result = stdout(&output);
-    assert!(result.contains("geneA"), "Should include A entry: {}", result);
-    assert!(result.contains("geneB"), "Should include B entry: {}", result);
+    assert!(
+        result.contains("geneA"),
+        "Should include A entry: {}",
+        result
+    );
+    assert!(
+        result.contains("geneB"),
+        "Should include B entry: {}",
+        result
+    );
 }
 
 // =============================================================================
@@ -823,7 +835,11 @@ fn test_coverage_histogram() {
     assert!(is_success(&output));
     let result = stdout(&output);
     // Should include histogram output with depth counts
-    assert!(!result.trim().is_empty(), "Should produce histogram: {}", result);
+    assert!(
+        !result.trim().is_empty(),
+        "Should produce histogram: {}",
+        result
+    );
 }
 
 /// Test --mean flag
@@ -874,7 +890,11 @@ fn test_slop_both() {
     assert!(is_success(&output));
     let result = stdout(&output);
     // Should expand to 50-250
-    assert!(result.contains("50\t250"), "Should expand both sides: {}", result);
+    assert!(
+        result.contains("50\t250"),
+        "Should expand both sides: {}",
+        result
+    );
 }
 
 /// Test --pct (percentage) flag
@@ -897,7 +917,11 @@ fn test_slop_percentage() {
     assert!(is_success(&output));
     let result = stdout(&output);
     // 50% of 100bp = 50bp each side, so 50-250
-    assert!(result.contains("50\t250"), "Should expand by percentage: {}", result);
+    assert!(
+        result.contains("50\t250"),
+        "Should expand by percentage: {}",
+        result
+    );
 }
 
 /// Test -s (strand-aware) flag
@@ -922,7 +946,11 @@ fn test_slop_strand_aware() {
     assert!(is_success(&output));
     let result = stdout(&output);
     // For minus strand, -l should extend 3' (right side)
-    assert!(result.contains("100\t250"), "Should extend 3' for minus strand: {}", result);
+    assert!(
+        result.contains("100\t250"),
+        "Should extend 3' for minus strand: {}",
+        result
+    );
 }
 
 // =============================================================================
@@ -1066,7 +1094,11 @@ fn test_complement_basic() {
     assert!(is_success(&output));
     let result = stdout(&output);
     // Should include 0-100, 200-300, 400-500
-    assert!(result.contains("0\t100"), "Should include 0-100: {}", result);
+    assert!(
+        result.contains("0\t100"),
+        "Should include 0-100: {}",
+        result
+    );
     assert!(
         result.contains("200\t300"),
         "Should include 200-300: {}",
@@ -1205,7 +1237,11 @@ fn test_multiinter_basic() {
 
     assert!(is_success(&output));
     let result = stdout(&output);
-    assert!(!result.is_empty(), "Should produce multiinter output: {}", result);
+    assert!(
+        !result.is_empty(),
+        "Should produce multiinter output: {}",
+        result
+    );
 }
 
 /// Test multiinter --cluster flag
