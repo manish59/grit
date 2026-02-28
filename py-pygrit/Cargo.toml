@@ -1,13 +1,13 @@
 [package]
-name = "py-rbedtools"
+name = "py-pygrit"
 version = "0.1.0"
 edition = "2021"
 authors = ["Manish Kumar Bobbili"]
-description = "Python bindings for rbedtools"
+description = "Python bindings for GRIT - high-performance genomic interval operations"
 license = "MIT"
 
 [lib]
-name = "rbedtools"
+name = "pygrit"
 crate-type = ["cdylib"]
 
 [dependencies]
@@ -16,4 +16,4 @@ numpy = "0.23"
 rayon = "1.10"
 
 # Link to the main library
-rbedtools = { path = ".." }
+grit-genomics = { path = ".." }
