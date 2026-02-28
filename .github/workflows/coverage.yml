@@ -36,7 +36,9 @@ jobs:
 
       - name: Generate coverage
         run: |
-          cargo tarpaulin --all --out Xml --output-dir coverage
+          # Exclude integration tests that spawn subprocesses (they timeout in coverage)
+          # Unit tests in lib provide actual code coverage
+          cargo tarpaulin --lib --out Xml --output-dir coverage --timeout 300
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@v4

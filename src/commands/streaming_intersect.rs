@@ -49,6 +49,7 @@
 
 use crate::bed::{BedError, BedReader};
 use crate::interval::BedRecord;
+use crate::streaming::buffers::{DEFAULT_INPUT_BUFFER, DEFAULT_OUTPUT_BUFFER};
 use crate::streaming::parsing::{parse_bed3_bytes, parse_bed3_bytes_with_rest, should_skip_line};
 use std::collections::{HashSet, VecDeque};
 use std::fs::File;
@@ -192,8 +193,8 @@ impl StreamingIntersectCommand {
         if self.same_strand || self.opposite_strand {
             let a_file = File::open(a_path.as_ref())?;
             let b_file = File::open(b_path.as_ref())?;
-            let a_reader = BedReader::new(BufReader::with_capacity(256 * 1024, a_file));
-            let b_reader = BedReader::new(BufReader::with_capacity(256 * 1024, b_file));
+            let a_reader = BedReader::new(BufReader::with_capacity(DEFAULT_INPUT_BUFFER, a_file));
+            let b_reader = BedReader::new(BufReader::with_capacity(DEFAULT_INPUT_BUFFER, b_file));
             return self.run_streaming(a_reader, b_reader, output);
         }
 
@@ -215,16 +216,16 @@ impl StreamingIntersectCommand {
     ) -> Result<StreamingStats, BedError> {
         let mut stats = StreamingStats::default();
 
-        // Large output buffer (8MB)
-        let mut writer = BufWriter::with_capacity(8 * 1024 * 1024, output);
+        // Output buffer (2MB default, reduced from 8MB for memory efficiency)
+        let mut writer = BufWriter::with_capacity(DEFAULT_OUTPUT_BUFFER, output);
 
-        // Stream A file with large buffer
+        // Stream A file
         let a_file = File::open(a_path.as_ref())?;
-        let mut a_reader = BufReader::with_capacity(256 * 1024, a_file);
+        let mut a_reader = BufReader::with_capacity(DEFAULT_INPUT_BUFFER, a_file);
 
-        // Stream B file with large buffer
+        // Stream B file
         let b_file = File::open(b_path.as_ref())?;
-        let mut b_reader = BufReader::with_capacity(256 * 1024, b_file);
+        let mut b_reader = BufReader::with_capacity(DEFAULT_INPUT_BUFFER, b_file);
 
         // Reusable line buffers
         let mut a_line_buf = String::with_capacity(1024);
