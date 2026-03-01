@@ -13,7 +13,7 @@ pygrit provides two main ways to work with genomic intervals:
 
 ### File-Based Operations
 
-Streaming functions that process BED files with O(k) memory:
+Functions that process BED files:
 
 - **[`intersect`](file-operations.md#intersect)**: Find overlapping intervals
 - **[`merge`](file-operations.md#merge)**: Merge overlapping intervals
@@ -21,6 +21,13 @@ Streaming functions that process BED files with O(k) memory:
 - **[`coverage`](file-operations.md#coverage)**: Calculate coverage
 - **[`closest`](file-operations.md#closest)**: Find closest intervals
 - **[`window`](file-operations.md#window)**: Find intervals within a window
+- **[`sort`](file-operations.md#sort)**: Sort BED files
+- **[`slop`](file-operations.md#slop)**: Extend interval boundaries
+- **[`complement`](file-operations.md#complement)**: Find gaps between intervals
+- **[`genomecov`](file-operations.md#genomecov)**: Genome-wide coverage
+- **[`jaccard`](file-operations.md#jaccard)**: Jaccard similarity
+- **[`multiinter`](file-operations.md#multiinter)**: Multi-file intersection
+- **[`generate`](file-operations.md#generate)**: Generate synthetic data
 
 ### I/O Functions
 
@@ -49,20 +56,45 @@ len(iv)  # 100
 ```python
 import pygrit
 
-# All public API
+# Core types
 pygrit.Interval
 pygrit.IntervalSet
+
+# File operations
 pygrit.intersect
 pygrit.merge
 pygrit.subtract
 pygrit.coverage
 pygrit.closest
 pygrit.window
+pygrit.sort
+pygrit.slop
+pygrit.complement
+pygrit.genomecov
+pygrit.jaccard
+pygrit.multiinter
+pygrit.generate
+
+# I/O
 pygrit.read_bed
 pygrit.parse_bed
 pygrit.from_numpy
+
+# Metadata
 pygrit.__version__
 ```
+
+## Input Requirements
+
+Most file-based functions require **sorted BED files** (sorted by chromosome, then by start position).
+
+Sort files first:
+
+```python
+pygrit.sort("unsorted.bed", output="sorted.bed")
+```
+
+Functions requiring a **genome file**: `slop`, `complement`, `genomecov`
 
 ## Type Summary
 
@@ -83,18 +115,3 @@ pygrit.__version__
 | `ValueError` | Invalid parameters (e.g., start > end) |
 | `IOError` | File not found or I/O errors |
 | `RuntimeError` | Processing errors (e.g., unsorted input) |
-
-## Thread Safety
-
-All file-based operations release the GIL during computation, making them safe for use with Python threading:
-
-```python
-from concurrent.futures import ThreadPoolExecutor
-
-with ThreadPoolExecutor(max_workers=4) as executor:
-    futures = [
-        executor.submit(pygrit.intersect, f"a{i}.bed", f"b{i}.bed")
-        for i in range(10)
-    ]
-    results = [f.result() for f in futures]
-```

@@ -7,38 +7,26 @@
 
 ## Install from PyPI
 
-The recommended way to install pygrit is via pip:
-
 ```bash
-pip install pygrit
+pip install grit-genomics
 ```
 
-## Install with Optional Dependencies
+The package is imported as `pygrit`:
 
-### Development Tools
-
-For running tests and type checking:
-
-```bash
-pip install pygrit[dev]
-```
-
-### Documentation Tools
-
-For building documentation locally:
-
-```bash
-pip install pygrit[docs]
+```python
+import pygrit
+print(pygrit.__version__)
 ```
 
 ## Install from Source
 
-To install from source, you need Rust and maturin:
+Building from source requires [Rust](https://rustup.rs/) and [maturin](https://github.com/PyO3/maturin).
 
 ### 1. Install Rust
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
 ```
 
 ### 2. Clone the Repository
@@ -66,30 +54,38 @@ maturin develop --release
 
 ```python
 import pygrit
+
+# Check version
 print(pygrit.__version__)
+
+# Test basic functionality
+iv = pygrit.Interval("chr1", 100, 200)
+print(iv)  # chr1	100	200
 ```
 
 ## Platform Support
 
-| Platform | Architecture | Status |
-|----------|--------------|--------|
-| Linux | x86_64 | Supported |
-| Linux | aarch64 | Supported |
-| macOS | x86_64 | Supported |
-| macOS | arm64 (Apple Silicon) | Supported |
-| Windows | x86_64 | Experimental |
+| Platform | Architecture | Pre-built Wheel | From Source |
+|----------|--------------|-----------------|-------------|
+| macOS | ARM64 (Apple Silicon) | Yes | Yes |
+| macOS | x86_64 | No | Yes |
+| Linux | x86_64 | No | Yes |
+| Linux | ARM64 | No | Yes |
+| Windows | x86_64 | No | Untested |
+
+For platforms without pre-built wheels, pip will attempt to build from source. This requires a Rust toolchain to be installed.
 
 ## Troubleshooting
 
 ### ImportError: No module named 'pygrit'
 
-Ensure you have installed pygrit in your active Python environment:
+Ensure you have installed grit-genomics:
 
 ```bash
-pip install pygrit
+pip install grit-genomics
 ```
 
-### Compilation Errors on Source Install
+### Build Errors (Source Install)
 
 Make sure you have the latest Rust toolchain:
 
@@ -97,11 +93,9 @@ Make sure you have the latest Rust toolchain:
 rustup update
 ```
 
-### NumPy Version Conflicts
-
-If you encounter NumPy compatibility issues:
+### NumPy Version Issues
 
 ```bash
 pip install --upgrade numpy
-pip install --force-reinstall pygrit
+pip install --force-reinstall grit-genomics
 ```

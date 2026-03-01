@@ -1,142 +1,72 @@
 # Performance Tips
 
-pygrit is designed for high performance. This guide covers best practices to maximize throughput and minimize memory usage.
-
-## Memory Complexity
-
-pygrit uses **O(k) memory complexity** where k is the maximum number of intervals overlapping at any genomic position. This means:
-
-- Memory usage is independent of file size
-- Only "active" intervals are kept in memory
-- Suitable for files of any size
-
-### Visualization
-
-```
-Intervals:     |-------|
-                   |-------|
-                       |-------|
-                                    |-------|
-
-Position:      ──────────────────────────────────────────
-
-k (active):    1   2   3   2   1   0   1   1   0
-```
-
-At position with k=3, only 3 intervals are in memory, regardless of file size.
+This guide covers best practices for using pygrit effectively.
 
 ## Best Practices
 
-### 1. Use File-Based Operations for Large Data
+### 1. Sort Your Input Files
 
-```python
-# Good: Streaming, constant memory
-pygrit.intersect("large_a.bed", "large_b.bed", output="result.bed")
-
-# Avoid for large files: Loads results into memory
-results = pygrit.intersect("large_a.bed", "large_b.bed")
-```
-
-### 2. Pre-Sort Your Files
-
-pygrit requires sorted input. Sort once and reuse:
+Most pygrit functions require sorted BED files (sorted by chromosome, then by start position).
 
 ```bash
-# Sort by chromosome, then by start position
+# Using grit CLI
+grit sort -i unsorted.bed > sorted.bed
+
+# Using Unix sort
 sort -k1,1 -k2,2n input.bed > sorted.bed
 ```
 
-!!! tip "Sorting in Python"
-    ```python
-    import subprocess
-    subprocess.run(["sort", "-k1,1", "-k2,2n", "input.bed", "-o", "sorted.bed"])
-    ```
-
-### 3. Use Output Files for Large Results
+Or in Python:
 
 ```python
-# Memory efficient: Write directly to file
+pygrit.sort("unsorted.bed", output="sorted.bed")
+```
+
+### 2. Use Output Files for Large Results
+
+When processing large files, write directly to output files instead of returning results to Python:
+
+```python
+# Recommended for large files: Write directly to file
 pygrit.intersect("a.bed", "b.bed", output="result.bed")
 
-# Only use list returns for small results
+# For small results: Return to Python
 small_results = pygrit.intersect("small_a.bed", "small_b.bed")
 ```
 
-### 4. Leverage Threading
+### 3. Apply Filters Early
 
-pygrit releases the GIL during computation, enabling parallel workloads:
-
-```python
-from concurrent.futures import ThreadPoolExecutor
-
-files = [("a1.bed", "b1.bed"), ("a2.bed", "b2.bed"), ("a3.bed", "b3.bed")]
-
-def process_pair(pair):
-    a, b = pair
-    return pygrit.intersect(a, b)
-
-with ThreadPoolExecutor(max_workers=4) as executor:
-    results = list(executor.map(process_pair, files))
-```
-
-### 5. Use Fraction Filters Early
-
-Apply fraction filters to reduce output size:
+Use filters during operations to reduce output size:
 
 ```python
-# Filter during intersection, not after
+# Filter during intersection
 pygrit.intersect("a.bed", "b.bed", fraction=0.5, output="result.bed")
-```
 
-### 6. Use Unique Mode When Appropriate
-
-If you only need to know which intervals overlap (not all overlaps):
-
-```python
-# More efficient: Each A interval reported once
+# Use unique mode when you only need to know which intervals overlap
 pygrit.intersect("a.bed", "b.bed", unique=True, output="result.bed")
-
-# Less efficient for this use case: Reports all overlaps
-pygrit.intersect("a.bed", "b.bed", output="result.bed")
 ```
 
-## Benchmarks
+### 4. Use the Right Tool for the Job
 
-### Throughput Comparison
-
-Processing 1M intervals (sequential, non-overlapping):
-
-| Operation | pygrit | pybedtools |
-|-----------|--------|------------|
-| intersect | ~2M/s | ~500K/s |
-| merge | ~3M/s | ~800K/s |
-| subtract | ~2M/s | ~400K/s |
-
-### Memory Usage
-
-Processing 10M intervals:
-
-| Tool | Peak Memory |
-|------|-------------|
-| pygrit | ~5 MB |
-| pybedtools | ~2 GB |
-| pyranges | ~1.5 GB |
+| Data Size | Recommendation |
+|-----------|----------------|
+| Small (<100K intervals) | In-memory operations work well |
+| Medium (100K - 10M) | File-based operations |
+| Large (>10M) | File-based with output files |
 
 ## Profiling Your Workload
 
 ### Memory Profiling
 
 ```python
-import resource
+import tracemalloc
 
-def get_memory_mb():
-    """Get current memory usage in MB."""
-    usage = resource.getrusage(resource.RUSAGE_SELF)
-    return usage.ru_maxrss / 1024 / 1024  # Convert to MB
-
-print(f"Before: {get_memory_mb():.1f} MB")
+tracemalloc.start()
 pygrit.intersect("a.bed", "b.bed", output="result.bed")
-print(f"After: {get_memory_mb():.1f} MB")
+current, peak = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+
+print(f"Peak memory: {peak / 1024 / 1024:.1f} MB")
 ```
 
 ### Timing
@@ -151,47 +81,66 @@ elapsed = time.perf_counter() - start
 print(f"Elapsed: {elapsed:.3f}s")
 ```
 
-## Common Performance Issues
+## Common Issues
 
 ### Unsorted Input
 
 **Symptom**: RuntimeError about unsorted input
 
-**Solution**: Sort your files:
-```bash
-sort -k1,1 -k2,2n input.bed > sorted.bed
+**Solution**: Sort your files first:
+
+```python
+pygrit.sort("unsorted.bed", output="sorted.bed")
 ```
 
-### High Memory with Many Overlaps
+### Missing Genome File
 
-**Symptom**: High memory usage despite using streaming
+**Symptom**: Error about missing genome file
 
-**Cause**: Many intervals overlap at the same position (high k value)
+**Solution**: Create a genome file (tab-separated chromosome name and size):
 
-**Solution**: This is expected behavior. Consider:
-
-- Filtering input to reduce overlap density
-- Processing chromosomes separately
-- Using more memory
-
-### Slow with Many Small Files
-
-**Symptom**: Poor performance with many small operations
-
-**Cause**: File I/O overhead dominates
-
-**Solution**: Concatenate small files:
-```bash
-cat file1.bed file2.bed file3.bed | sort -k1,1 -k2,2n > combined.bed
+```
+chr1	248956422
+chr2	242193529
+chr3	198295559
 ```
 
-## Hardware Recommendations
+Functions that require genome files: `slop`, `complement`, `genomecov`
 
-| Workload | CPU | RAM | Storage |
-|----------|-----|-----|---------|
-| Small (<1M intervals) | Any | 4 GB | Any |
-| Medium (1-100M intervals) | 4+ cores | 8 GB | SSD |
-| Large (>100M intervals) | 8+ cores | 16 GB | NVMe SSD |
+### High Memory Usage
 
-!!! note "CPU Cores"
-    pygrit operations are single-threaded but release the GIL. Multiple operations can run in parallel using Python threading.
+**Symptom**: High memory usage when processing large files
+
+**Solutions**:
+
+1. Use `output=` parameter to write directly to files
+2. Process chromosomes separately
+3. Use smaller input files
+
+## Benchmark Your Own Data
+
+Performance varies significantly based on:
+
+- Data size and distribution
+- Overlap density
+- Hardware (CPU, disk speed, RAM)
+
+We recommend benchmarking on your own datasets:
+
+```python
+import time
+import tempfile
+
+def benchmark(func, *args, **kwargs):
+    start = time.perf_counter()
+    func(*args, **kwargs)
+    return time.perf_counter() - start
+
+with tempfile.NamedTemporaryFile(suffix=".bed") as tmp:
+    elapsed = benchmark(
+        pygrit.intersect,
+        "a.bed", "b.bed",
+        output=tmp.name
+    )
+    print(f"intersect: {elapsed:.3f}s")
+```

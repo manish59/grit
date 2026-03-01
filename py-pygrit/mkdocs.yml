@@ -1,5 +1,5 @@
-site_name: pygrit
-site_description: High-performance genomic interval operations for Python
+site_name: grit-genomics
+site_description: Python bindings for GRIT (Genomic Range Interval Toolkit)
 site_url: https://grit-genomics.readthedocs.io/
 repo_url: https://github.com/manish59/grit
 repo_name: manish59/grit

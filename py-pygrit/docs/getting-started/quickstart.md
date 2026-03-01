@@ -1,6 +1,12 @@
 # Quick Start
 
-This guide will get you up and running with pygrit in minutes.
+This guide will get you up and running with pygrit.
+
+## Installation
+
+```bash
+pip install grit-genomics
+```
 
 ## Basic Concepts
 
@@ -62,33 +68,54 @@ merged = pygrit.merge("input.bed")
 merged = pygrit.merge("input.bed", distance=1000)
 ```
 
-### Subtracting Intervals
+### Sorting a BED File
 
 ```python
-# Remove regions that overlap with exclusion zones
-result = pygrit.subtract("features.bed", "exclude.bed")
+# Sort an unsorted BED file
+pygrit.sort("unsorted.bed", output="sorted.bed")
+```
+
+## Input Requirements
+
+**Important**: Most functions require sorted BED files (sorted by chromosome, then by start position).
+
+Sort your files first:
+
+```bash
+# Using grit CLI
+grit sort -i unsorted.bed > sorted.bed
+
+# Using Unix sort
+sort -k1,1 -k2,2n unsorted.bed > sorted.bed
+```
+
+Or in Python:
+
+```python
+pygrit.sort("unsorted.bed", output="sorted.bed")
 ```
 
 ## File-Based vs In-Memory Operations
 
-pygrit provides two ways to work with intervals:
+### File-Based Operations
 
-### File-Based (Streaming)
-
-Best for large files. Operations stream through the data with O(k) memory:
+Process files directly - suitable for larger files:
 
 ```python
-# Process files directly - memory efficient
-pygrit.intersect("large_a.bed", "large_b.bed", output="result.bed")
+# Returns list of Interval objects
+overlaps = pygrit.intersect("a.bed", "b.bed")
+
+# Or write directly to file
+pygrit.intersect("a.bed", "b.bed", output="result.bed")
 ```
 
-### In-Memory
+### In-Memory Operations
 
-Best for smaller datasets or when you need to manipulate intervals programmatically:
+Load intervals into memory for manipulation:
 
 ```python
-# Load into memory for manipulation
-intervals = pygrit.read_bed("small.bed")
+# Load into memory
+intervals = pygrit.read_bed("regions.bed")
 merged = intervals.merge(distance=100)
 
 # Convert to list for iteration
@@ -129,7 +156,6 @@ Most file-based operations support these options:
 | `output` | Write to file instead of returning list |
 | `fraction` | Minimum overlap fraction (0.0-1.0) |
 | `reciprocal` | Require reciprocal overlap fraction |
-| `count` | Report overlap count instead of intervals |
 
 ### Example: Reciprocal Overlap
 
@@ -146,6 +172,6 @@ pygrit.intersect(
 
 ## Next Steps
 
-- [File Operations Guide](../guide/file-operations.md) - Detailed guide on file-based operations
+- [File Operations Guide](../guide/file-operations.md) - Detailed guide on all commands
 - [In-Memory Guide](../guide/in-memory.md) - Working with intervals in memory
 - [API Reference](../api/index.md) - Complete API documentation
