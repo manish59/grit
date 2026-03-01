@@ -257,6 +257,217 @@ class TestCoverageParity:
         assert py_content == cli_output
 
 
+class TestWindowParity:
+    """Test pygrit.window produces same results as grit window."""
+
+    def test_window_parity(self, sample_bed_a, sample_bed_b, temp_dir):
+        """Compare window output."""
+        py_output = temp_dir / "py_window.bed"
+        pygrit.window(
+            str(sample_bed_a),
+            str(sample_bed_b),
+            output=str(py_output),
+            window=1000,
+        )
+
+        cli_output = run_grit_cli([
+            "window",
+            "--assume-sorted",
+            "-a", str(sample_bed_a),
+            "-b", str(sample_bed_b),
+            "-w", "1000",
+        ])
+
+        py_content = py_output.read_text()
+        assert py_content == cli_output
+
+
+class TestSortParity:
+    """Test pygrit.sort produces same results as grit sort."""
+
+    def test_sort_parity(self, temp_dir):
+        """Compare sort output."""
+        unsorted_file = temp_dir / "unsorted.bed"
+        unsorted_file.write_text(
+            "chr2\t100\t200\n"
+            "chr1\t300\t400\n"
+            "chr1\t100\t200\n"
+            "chr3\t50\t150\n"
+        )
+
+        py_output = temp_dir / "py_sorted.bed"
+        pygrit.sort(str(unsorted_file), output=str(py_output))
+
+        cli_output = run_grit_cli([
+            "sort",
+            "-i", str(unsorted_file),
+        ])
+
+        py_content = py_output.read_text()
+        assert py_content == cli_output
+
+
+class TestSlopParity:
+    """Test pygrit.slop produces same results as grit slop."""
+
+    def test_slop_both_parity(self, temp_dir):
+        """Compare slop -b output."""
+        bed_file = temp_dir / "test.bed"
+        bed_file.write_text("chr1\t100\t200\n")
+        genome_file = temp_dir / "genome.txt"
+        genome_file.write_text("chr1\t1000\n")
+
+        py_output = temp_dir / "py_slop.bed"
+        pygrit.slop(
+            str(bed_file),
+            str(genome_file),
+            both=50.0,
+            output=str(py_output),
+        )
+
+        cli_output = run_grit_cli([
+            "slop",
+            "-i", str(bed_file),
+            "-g", str(genome_file),
+            "-b", "50",
+        ])
+
+        py_content = py_output.read_text()
+        assert py_content == cli_output
+
+    def test_slop_left_right_parity(self, temp_dir):
+        """Compare slop -l -r output."""
+        bed_file = temp_dir / "test.bed"
+        bed_file.write_text("chr1\t100\t200\n")
+        genome_file = temp_dir / "genome.txt"
+        genome_file.write_text("chr1\t1000\n")
+
+        py_output = temp_dir / "py_slop.bed"
+        pygrit.slop(
+            str(bed_file),
+            str(genome_file),
+            left=25.0,
+            right=75.0,
+            output=str(py_output),
+        )
+
+        cli_output = run_grit_cli([
+            "slop",
+            "-i", str(bed_file),
+            "-g", str(genome_file),
+            "-l", "25",
+            "-r", "75",
+        ])
+
+        py_content = py_output.read_text()
+        assert py_content == cli_output
+
+
+class TestComplementParity:
+    """Test pygrit.complement produces same results as grit complement."""
+
+    def test_complement_parity(self, temp_dir):
+        """Compare complement output."""
+        bed_file = temp_dir / "test.bed"
+        bed_file.write_text("chr1\t100\t200\nchr1\t300\t400\n")
+        genome_file = temp_dir / "genome.txt"
+        genome_file.write_text("chr1\t500\n")
+
+        py_output = temp_dir / "py_complement.bed"
+        pygrit.complement(
+            str(bed_file),
+            str(genome_file),
+            output=str(py_output),
+        )
+
+        cli_output = run_grit_cli([
+            "complement",
+            "-i", str(bed_file),
+            "-g", str(genome_file),
+        ])
+
+        py_content = py_output.read_text()
+        assert py_content == cli_output
+
+
+class TestGenomecovParity:
+    """Test pygrit.genomecov produces same results as grit genomecov."""
+
+    def test_genomecov_bg_parity(self, temp_dir):
+        """Compare genomecov -bg output."""
+        bed_file = temp_dir / "test.bed"
+        bed_file.write_text("chr1\t100\t200\nchr1\t150\t250\n")
+        genome_file = temp_dir / "genome.txt"
+        genome_file.write_text("chr1\t500\n")
+
+        py_output = temp_dir / "py_genomecov.bg"
+        pygrit.genomecov(
+            str(bed_file),
+            str(genome_file),
+            bg=True,
+            output=str(py_output),
+        )
+
+        cli_output = run_grit_cli([
+            "genomecov",
+            "-i", str(bed_file),
+            "-g", str(genome_file),
+            "--bg",
+            "--streaming",
+            "--assume-sorted",
+        ])
+
+        py_content = py_output.read_text()
+        assert py_content == cli_output
+
+
+class TestJaccardParity:
+    """Test pygrit.jaccard produces same results as grit jaccard."""
+
+    def test_jaccard_parity(self, sample_bed_a, sample_bed_b, temp_dir):
+        """Compare jaccard output."""
+        py_output = temp_dir / "py_jaccard.txt"
+        pygrit.jaccard(
+            str(sample_bed_a),
+            str(sample_bed_b),
+            output=str(py_output),
+        )
+
+        cli_output = run_grit_cli([
+            "jaccard",
+            "-a", str(sample_bed_a),
+            "-b", str(sample_bed_b),
+        ])
+
+        py_content = py_output.read_text()
+        assert py_content == cli_output
+
+
+class TestMultiinterParity:
+    """Test pygrit.multiinter produces same results as grit multiinter."""
+
+    def test_multiinter_parity(self, temp_dir):
+        """Compare multiinter output."""
+        a_file = temp_dir / "a.bed"
+        b_file = temp_dir / "b.bed"
+        a_file.write_text("chr1\t100\t200\nchr1\t300\t400\n")
+        b_file.write_text("chr1\t150\t250\nchr1\t350\t450\n")
+
+        py_output = temp_dir / "py_multiinter.bed"
+        pygrit.multiinter(
+            [str(a_file), str(b_file)],
+            output=str(py_output),
+        )
+
+        cli_output = run_grit_cli([
+            "multiinter",
+            "-i", str(a_file), str(b_file),
+        ])
+
+        py_content = py_output.read_text()
+        assert py_content == cli_output
+
+
 class TestLargeFileParity:
     """Test parity with larger files."""
 
