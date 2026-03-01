@@ -38,6 +38,13 @@ dev = [
     "pytest-benchmark>=4.0",
     "mypy>=1.0",
 ]
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.0",
+    "mkdocstrings[python]>=0.24",
+    "mkdocs-gen-files>=0.5",
+    "mkdocs-literate-nav>=0.6",
+]
 
 [project.urls]
 Homepage = "https://github.com/manish59/grit"
