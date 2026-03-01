@@ -312,3 +312,328 @@ result = pygrit.window("genes.bed", "enhancers.bed", left=5000, right=1000)
 # Count mode
 result = pygrit.window("a.bed", "b.bed", count=True)
 ```
+
+---
+
+## sort
+
+```python
+def sort(
+    input: str,
+    output: str | None = None,
+    genome: str | None = None,
+    reverse: bool = False,
+) -> str | None
+```
+
+Sort a BED file by chromosome and start position.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `input` | `str` | - | Path to input BED file |
+| `output` | `str \| None` | `None` | Output file path. If None, returns string |
+| `genome` | `str \| None` | `None` | Genome file for chromosome ordering |
+| `reverse` | `bool` | `False` | Sort in reverse order |
+
+### Returns
+
+- `str` if `output` is None (sorted output as string)
+- `None` if `output` is specified
+
+### Examples
+
+```python
+# Basic sort
+sorted_bed = pygrit.sort("unsorted.bed")
+
+# Write to file
+pygrit.sort("unsorted.bed", output="sorted.bed")
+
+# Reverse sort
+pygrit.sort("input.bed", reverse=True, output="reversed.bed")
+
+# Use genome file for chromosome ordering
+pygrit.sort("input.bed", genome="genome.txt", output="sorted.bed")
+```
+
+---
+
+## slop
+
+```python
+def slop(
+    input: str,
+    genome: str,
+    output: str | None = None,
+    both: float | None = None,
+    left: float | None = None,
+    right: float | None = None,
+    pct: bool = False,
+) -> str | None
+```
+
+Extend intervals by a specified amount on each side.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `input` | `str` | - | Path to input BED file |
+| `genome` | `str` | - | Path to genome file (chromosome sizes) |
+| `output` | `str \| None` | `None` | Output file path. If None, returns string |
+| `both` | `float \| None` | `None` | Extend both sides by this amount |
+| `left` | `float \| None` | `None` | Extend left (5') side |
+| `right` | `float \| None` | `None` | Extend right (3') side |
+| `pct` | `bool` | `False` | Interpret values as percentage of interval length |
+
+### Returns
+
+- `str` if `output` is None (extended intervals as string)
+- `None` if `output` is specified
+
+### Examples
+
+```python
+# Extend both sides by 100bp
+result = pygrit.slop("regions.bed", "genome.txt", both=100.0)
+
+# Asymmetric extension
+result = pygrit.slop("regions.bed", "genome.txt", left=50.0, right=200.0)
+
+# Percentage-based extension (50% of interval length)
+result = pygrit.slop("regions.bed", "genome.txt", both=0.5, pct=True)
+
+# Write to file
+pygrit.slop("regions.bed", "genome.txt", both=100.0, output="extended.bed")
+```
+
+---
+
+## complement
+
+```python
+def complement(
+    input: str,
+    genome: str,
+    output: str | None = None,
+) -> str | None
+```
+
+Calculate the complement of intervals (gaps between intervals).
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `input` | `str` | - | Path to input BED file |
+| `genome` | `str` | - | Path to genome file (chromosome sizes) |
+| `output` | `str \| None` | `None` | Output file path. If None, returns string |
+
+### Returns
+
+- `str` if `output` is None (complement intervals as string)
+- `None` if `output` is specified
+
+### Examples
+
+```python
+# Get gaps between intervals
+gaps = pygrit.complement("features.bed", "genome.txt")
+
+# Write to file
+pygrit.complement("features.bed", "genome.txt", output="gaps.bed")
+```
+
+---
+
+## genomecov
+
+```python
+def genomecov(
+    input: str,
+    genome: str,
+    output: str | None = None,
+    bg: bool = False,
+    bga: bool = False,
+    scale: float = 1.0,
+) -> str | None
+```
+
+Calculate genome-wide coverage.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `input` | `str` | - | Path to input BED file |
+| `genome` | `str` | - | Path to genome file (chromosome sizes) |
+| `output` | `str \| None` | `None` | Output file path. If None, returns string |
+| `bg` | `bool` | `False` | Output BedGraph format (non-zero regions only) |
+| `bga` | `bool` | `False` | Output BedGraph format (all regions, including zero) |
+| `scale` | `float` | `1.0` | Scale coverage by this factor |
+
+### Returns
+
+- `str` if `output` is None (coverage output as string)
+- `None` if `output` is specified
+
+### Examples
+
+```python
+# Histogram output (default)
+result = pygrit.genomecov("reads.bed", "genome.txt")
+
+# BedGraph format (non-zero only)
+result = pygrit.genomecov("reads.bed", "genome.txt", bg=True)
+
+# BedGraph with zero coverage regions
+result = pygrit.genomecov("reads.bed", "genome.txt", bga=True)
+
+# Scaled coverage
+result = pygrit.genomecov("reads.bed", "genome.txt", bg=True, scale=0.5)
+```
+
+---
+
+## jaccard
+
+```python
+def jaccard(
+    a: str,
+    b: str,
+    output: str | None = None,
+) -> str | None
+```
+
+Calculate Jaccard similarity between two BED files.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `a` | `str` | - | Path to file A |
+| `b` | `str` | - | Path to file B |
+| `output` | `str \| None` | `None` | Output file path. If None, returns string |
+
+### Returns
+
+- `str` if `output` is None (Jaccard statistics as string)
+- `None` if `output` is specified
+
+### Examples
+
+```python
+# Calculate Jaccard similarity
+result = pygrit.jaccard("set_a.bed", "set_b.bed")
+print(result)  # intersection, union, jaccard, n_intersections
+
+# Write to file
+pygrit.jaccard("set_a.bed", "set_b.bed", output="similarity.txt")
+```
+
+---
+
+## multiinter
+
+```python
+def multiinter(
+    inputs: list[str],
+    output: str | None = None,
+    cluster: bool = False,
+) -> str | None
+```
+
+Find intervals that overlap across multiple BED files.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `inputs` | `list[str]` | - | List of paths to input BED files (minimum 2) |
+| `output` | `str \| None` | `None` | Output file path. If None, returns string |
+| `cluster` | `bool` | `False` | Cluster overlapping intervals |
+
+### Returns
+
+- `str` if `output` is None (multiinter output as string)
+- `None` if `output` is specified
+
+### Raises
+
+- `ValueError`: If fewer than 2 input files provided
+
+### Examples
+
+```python
+# Find regions covered by multiple files
+result = pygrit.multiinter(["a.bed", "b.bed", "c.bed"])
+
+# With clustering
+result = pygrit.multiinter(["a.bed", "b.bed"], cluster=True)
+
+# Write to file
+pygrit.multiinter(["a.bed", "b.bed", "c.bed"], output="overlap.bed")
+```
+
+---
+
+## generate
+
+```python
+def generate(
+    output_dir: str,
+    num_intervals: int = 10000,
+    num_chroms: int = 5,
+    chrom_size: int = 100000000,
+    len_min: int = 50,
+    len_max: int = 5000,
+    mode: str = "uniform",
+    num_files: int = 2,
+    sorted: bool = True,
+    seed: int | None = None,
+) -> dict
+```
+
+Generate synthetic BED files for testing and benchmarking.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `output_dir` | `str` | - | Output directory path |
+| `num_intervals` | `int` | `10000` | Number of intervals per file |
+| `num_chroms` | `int` | `5` | Number of chromosomes |
+| `chrom_size` | `int` | `100000000` | Size of each chromosome |
+| `len_min` | `int` | `50` | Minimum interval length |
+| `len_max` | `int` | `5000` | Maximum interval length |
+| `mode` | `str` | `"uniform"` | Distribution mode: "uniform", "balanced", "clustered" |
+| `num_files` | `int` | `2` | Number of files to generate |
+| `sorted` | `bool` | `True` | Generate sorted output |
+| `seed` | `int \| None` | `None` | Random seed for reproducibility |
+
+### Returns
+
+- `dict` with generation statistics:
+    - `total_files`: Number of files generated
+    - `total_intervals`: Total intervals across all files
+    - `elapsed_secs`: Time taken in seconds
+
+### Raises
+
+- `ValueError`: If invalid mode specified
+
+### Examples
+
+```python
+# Generate test files
+stats = pygrit.generate("./test_data", num_intervals=10000)
+print(f"Generated {stats['total_files']} files")
+
+# Clustered distribution
+stats = pygrit.generate("./data", mode="clustered", seed=42)
+
+# Reproducible generation
+stats = pygrit.generate("./data", num_intervals=5000, seed=12345)
+```

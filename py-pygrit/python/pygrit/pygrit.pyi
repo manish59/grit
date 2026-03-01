@@ -551,6 +551,319 @@ def window(
     ...
 
 
+@overload
+def sort(
+    input: str,
+    *,
+    output: None = None,
+    genome: str | None = None,
+    reverse: bool = False,
+) -> str:
+    ...
+
+
+@overload
+def sort(
+    input: str,
+    *,
+    output: str,
+    genome: str | None = None,
+    reverse: bool = False,
+) -> None:
+    ...
+
+
+def sort(
+    input: str,
+    *,
+    output: str | None = None,
+    genome: str | None = None,
+    reverse: bool = False,
+) -> str | None:
+    """Sort a BED file by chromosome and start position.
+
+    Args:
+        input: Path to input BED file.
+        output: Output file path. If None, returns string.
+        genome: Genome file for chromosome ordering.
+        reverse: Sort in reverse order.
+
+    Returns:
+        Sorted output as string if output is None,
+        otherwise None (results written to file).
+    """
+    ...
+
+
+@overload
+def slop(
+    input: str,
+    genome: str,
+    *,
+    output: None = None,
+    both: float | None = None,
+    left: float | None = None,
+    right: float | None = None,
+    pct: bool = False,
+) -> str:
+    ...
+
+
+@overload
+def slop(
+    input: str,
+    genome: str,
+    *,
+    output: str,
+    both: float | None = None,
+    left: float | None = None,
+    right: float | None = None,
+    pct: bool = False,
+) -> None:
+    ...
+
+
+def slop(
+    input: str,
+    genome: str,
+    *,
+    output: str | None = None,
+    both: float | None = None,
+    left: float | None = None,
+    right: float | None = None,
+    pct: bool = False,
+) -> str | None:
+    """Extend intervals by a specified amount on each side.
+
+    Args:
+        input: Path to input BED file.
+        genome: Path to genome file (chromosome sizes).
+        output: Output file path. If None, returns string.
+        both: Extend both sides by this amount.
+        left: Extend left (5') side.
+        right: Extend right (3') side.
+        pct: Interpret values as percentage of interval length.
+
+    Returns:
+        Extended intervals as string if output is None,
+        otherwise None (results written to file).
+    """
+    ...
+
+
+@overload
+def complement(
+    input: str,
+    genome: str,
+    *,
+    output: None = None,
+) -> str:
+    ...
+
+
+@overload
+def complement(
+    input: str,
+    genome: str,
+    *,
+    output: str,
+) -> None:
+    ...
+
+
+def complement(
+    input: str,
+    genome: str,
+    *,
+    output: str | None = None,
+) -> str | None:
+    """Calculate the complement of intervals (gaps between intervals).
+
+    Args:
+        input: Path to input BED file.
+        genome: Path to genome file (chromosome sizes).
+        output: Output file path. If None, returns string.
+
+    Returns:
+        Complement intervals as string if output is None,
+        otherwise None (results written to file).
+    """
+    ...
+
+
+@overload
+def genomecov(
+    input: str,
+    genome: str,
+    *,
+    output: None = None,
+    bg: bool = False,
+    bga: bool = False,
+    scale: float = 1.0,
+) -> str:
+    ...
+
+
+@overload
+def genomecov(
+    input: str,
+    genome: str,
+    *,
+    output: str,
+    bg: bool = False,
+    bga: bool = False,
+    scale: float = 1.0,
+) -> None:
+    ...
+
+
+def genomecov(
+    input: str,
+    genome: str,
+    *,
+    output: str | None = None,
+    bg: bool = False,
+    bga: bool = False,
+    scale: float = 1.0,
+) -> str | None:
+    """Calculate genome-wide coverage.
+
+    Args:
+        input: Path to input BED file.
+        genome: Path to genome file (chromosome sizes).
+        output: Output file path. If None, returns string.
+        bg: Output BedGraph format (non-zero regions only).
+        bga: Output BedGraph format (all regions, including zero).
+        scale: Scale coverage by this factor.
+
+    Returns:
+        Coverage output as string if output is None,
+        otherwise None (results written to file).
+    """
+    ...
+
+
+@overload
+def jaccard(
+    a: str,
+    b: str,
+    *,
+    output: None = None,
+) -> str:
+    ...
+
+
+@overload
+def jaccard(
+    a: str,
+    b: str,
+    *,
+    output: str,
+) -> None:
+    ...
+
+
+def jaccard(
+    a: str,
+    b: str,
+    *,
+    output: str | None = None,
+) -> str | None:
+    """Calculate Jaccard similarity between two BED files.
+
+    Args:
+        a: Path to file A.
+        b: Path to file B.
+        output: Output file path. If None, returns string.
+
+    Returns:
+        Jaccard statistics as string if output is None,
+        otherwise None (results written to file).
+    """
+    ...
+
+
+@overload
+def multiinter(
+    inputs: list[str],
+    *,
+    output: None = None,
+    cluster: bool = False,
+) -> str:
+    ...
+
+
+@overload
+def multiinter(
+    inputs: list[str],
+    *,
+    output: str,
+    cluster: bool = False,
+) -> None:
+    ...
+
+
+def multiinter(
+    inputs: list[str],
+    *,
+    output: str | None = None,
+    cluster: bool = False,
+) -> str | None:
+    """Find intervals that overlap across multiple BED files.
+
+    Args:
+        inputs: List of paths to input BED files (minimum 2).
+        output: Output file path. If None, returns string.
+        cluster: Cluster overlapping intervals.
+
+    Returns:
+        Multiinter output as string if output is None,
+        otherwise None (results written to file).
+
+    Raises:
+        ValueError: If fewer than 2 input files provided.
+    """
+    ...
+
+
+def generate(
+    output_dir: str,
+    num_intervals: int = 10000,
+    num_chroms: int = 5,
+    chrom_size: int = 100000000,
+    len_min: int = 50,
+    len_max: int = 5000,
+    mode: str = "uniform",
+    num_files: int = 2,
+    sorted: bool = True,
+    seed: int | None = None,
+) -> dict[str, int | float]:
+    """Generate synthetic BED files for testing and benchmarking.
+
+    Args:
+        output_dir: Output directory path.
+        num_intervals: Number of intervals per file.
+        num_chroms: Number of chromosomes.
+        chrom_size: Size of each chromosome.
+        len_min: Minimum interval length.
+        len_max: Maximum interval length.
+        mode: Distribution mode: "uniform", "balanced", "clustered".
+        num_files: Number of files to generate.
+        sorted: Generate sorted output.
+        seed: Random seed for reproducibility.
+
+    Returns:
+        Dict with generation statistics:
+            - total_files: Number of files generated
+            - total_intervals: Total intervals across all files
+            - elapsed_secs: Time taken in seconds
+
+    Raises:
+        ValueError: If invalid mode specified.
+    """
+    ...
+
+
 # I/O functions
 
 def read_bed(path: str) -> IntervalSet:

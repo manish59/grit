@@ -17,10 +17,14 @@ use grit_genomics::bed::{
     parse_intervals as rs_parse_intervals, read_intervals as rs_read_intervals, BedError,
 };
 use grit_genomics::commands::{
-    IntersectCommand as RsIntersectCommand, MergeCommand as RsMergeCommand,
-    StreamingClosestCommand, StreamingCoverageCommand, StreamingIntersectCommand,
-    StreamingMergeCommand, StreamingSubtractCommand, StreamingWindowCommand,
+    ComplementCommand, FastSortCommand, GenerateCommand, GenerateConfig, GenerateMode,
+    IntersectCommand as RsIntersectCommand, JaccardCommand, MergeCommand as RsMergeCommand,
+    SizeSpec, SlopCommand, SortMode, StreamingClosestCommand, StreamingCoverageCommand,
+    StreamingGenomecovCommand, StreamingGenomecovMode, StreamingIntersectCommand,
+    StreamingMergeCommand, StreamingMultiinterCommand, StreamingSubtractCommand,
+    StreamingWindowCommand,
 };
+use grit_genomics::genome::Genome;
 use grit_genomics::index::IntervalIndex as RsIntervalIndex;
 use grit_genomics::interval::Interval as RsInterval;
 
@@ -615,6 +619,372 @@ pub fn window(
     }
 }
 
+/// Sort a BED file by chromosome and position.
+///
+/// Args:
+///     input: Path to input BED file
+///     output: Optional output file path
+///     genome: Optional genome file for chromosome ordering
+///     reverse: Reverse the sort order
+///
+/// Returns:
+///     Sorted output as string if output is None, otherwise None.
+#[pyfunction]
+#[pyo3(signature = (input, output = None, genome = None, reverse = false))]
+pub fn sort(
+    py: Python<'_>,
+    input: &str,
+    output: Option<&str>,
+    genome: Option<&str>,
+    reverse: bool,
+) -> PyResult<Option<String>> {
+    let result = py
+        .allow_threads(|| -> Result<Vec<u8>, BedError> {
+            let input_path = PathBuf::from(input);
+
+            let mut cmd = FastSortCommand::new();
+            cmd.reverse = reverse;
+
+            let cmd = if let Some(genome_path) = genome {
+                let genome_data = Genome::from_file(genome_path)?;
+                cmd.with_genome(&genome_data)
+            } else {
+                cmd
+            };
+
+            let mut buffer = Vec::new();
+            cmd.run(&input_path, &mut buffer)?;
+            Ok(buffer)
+        })
+        .map_err(to_py_err)?;
+
+    if let Some(output_path) = output {
+        std::fs::write(output_path, &result).map_err(|e| PyIOError::new_err(e.to_string()))?;
+        Ok(None)
+    } else {
+        let output_str =
+            String::from_utf8(result).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(Some(output_str))
+    }
+}
+
+/// Extend intervals by a given number of bases.
+///
+/// Args:
+///     input: Path to input BED file
+///     genome: Path to genome file (chromosome sizes)
+///     output: Optional output file path
+///     both: Extend both sides by this many bases
+///     left: Extend left/upstream by this many bases
+///     right: Extend right/downstream by this many bases
+///     strand: Use strand info (left=upstream, right=downstream)
+///     pct: Interpret values as fraction of interval size
+///
+/// Returns:
+///     Slop output as string if output is None, otherwise None.
+#[pyfunction]
+#[pyo3(signature = (input, genome, output = None, both = 0.0, left = None, right = None, strand = false, pct = false))]
+pub fn slop(
+    py: Python<'_>,
+    input: &str,
+    genome: &str,
+    output: Option<&str>,
+    both: f64,
+    left: Option<f64>,
+    right: Option<f64>,
+    strand: bool,
+    pct: bool,
+) -> PyResult<Option<String>> {
+    let result = py
+        .allow_threads(|| -> Result<Vec<u8>, BedError> {
+            let input_path = PathBuf::from(input);
+            let genome_data = Genome::from_file(genome)?;
+
+            let mut cmd = SlopCommand::new();
+            cmd.both = both;
+            cmd.left = left;
+            cmd.right = right;
+            cmd.strand = strand;
+            cmd.pct = pct;
+
+            let mut buffer = Vec::new();
+            cmd.run(&input_path, &genome_data, &mut buffer)?;
+            Ok(buffer)
+        })
+        .map_err(to_py_err)?;
+
+    if let Some(output_path) = output {
+        std::fs::write(output_path, &result).map_err(|e| PyIOError::new_err(e.to_string()))?;
+        Ok(None)
+    } else {
+        let output_str =
+            String::from_utf8(result).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(Some(output_str))
+    }
+}
+
+/// Return intervals NOT covered by the input BED file.
+///
+/// Args:
+///     input: Path to input BED file
+///     genome: Path to genome file (chromosome sizes)
+///     output: Optional output file path
+///
+/// Returns:
+///     Complement output as string if output is None, otherwise None.
+#[pyfunction]
+#[pyo3(signature = (input, genome, output = None))]
+pub fn complement(
+    py: Python<'_>,
+    input: &str,
+    genome: &str,
+    output: Option<&str>,
+) -> PyResult<Option<String>> {
+    let result = py
+        .allow_threads(|| -> Result<Vec<u8>, BedError> {
+            let input_path = PathBuf::from(input);
+            let genome_data = Genome::from_file(genome)?;
+
+            let cmd = ComplementCommand::new().with_assume_sorted(true);
+
+            let file = std::fs::File::open(&input_path)?;
+            let reader = grit_genomics::bed::BedReader::new(file);
+
+            let mut buffer = Vec::new();
+            cmd.complement_streaming(reader, &genome_data, &mut buffer)?;
+            Ok(buffer)
+        })
+        .map_err(to_py_err)?;
+
+    if let Some(output_path) = output {
+        std::fs::write(output_path, &result).map_err(|e| PyIOError::new_err(e.to_string()))?;
+        Ok(None)
+    } else {
+        let output_str =
+            String::from_utf8(result).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(Some(output_str))
+    }
+}
+
+/// Compute genome-wide coverage.
+///
+/// Args:
+///     input: Path to input BED file
+///     genome: Path to genome file (chromosome sizes)
+///     output: Optional output file path
+///     per_base: Report depth at each position (1-based)
+///     bg: Report BedGraph format (non-zero only)
+///     bga: Report BedGraph format (including zero coverage)
+///     scale: Scale depth by factor
+///
+/// Returns:
+///     Genomecov output as string if output is None, otherwise None.
+#[pyfunction]
+#[pyo3(signature = (input, genome, output = None, per_base = false, bg = false, bga = false, scale = 1.0))]
+pub fn genomecov(
+    py: Python<'_>,
+    input: &str,
+    genome: &str,
+    output: Option<&str>,
+    per_base: bool,
+    bg: bool,
+    bga: bool,
+    scale: f64,
+) -> PyResult<Option<String>> {
+    let result = py
+        .allow_threads(|| -> Result<Vec<u8>, BedError> {
+            let input_path = PathBuf::from(input);
+            let genome_data = Genome::from_file(genome)?;
+
+            let mode = if per_base {
+                StreamingGenomecovMode::PerBase
+            } else if bg {
+                StreamingGenomecovMode::BedGraph
+            } else if bga {
+                StreamingGenomecovMode::BedGraphAll
+            } else {
+                StreamingGenomecovMode::Histogram
+            };
+
+            let cmd = StreamingGenomecovCommand::new()
+                .with_mode(mode)
+                .with_scale(scale)
+                .with_assume_sorted(true);
+
+            let mut buffer = Vec::new();
+            cmd.run(&input_path, &genome_data, &mut buffer)?;
+            Ok(buffer)
+        })
+        .map_err(to_py_err)?;
+
+    if let Some(output_path) = output {
+        std::fs::write(output_path, &result).map_err(|e| PyIOError::new_err(e.to_string()))?;
+        Ok(None)
+    } else {
+        let output_str =
+            String::from_utf8(result).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(Some(output_str))
+    }
+}
+
+/// Calculate Jaccard similarity between two BED files.
+///
+/// Args:
+///     a: Path to file A
+///     b: Path to file B
+///     output: Optional output file path
+///
+/// Returns:
+///     Jaccard output as string if output is None, otherwise None.
+///     Format: intersection\tunion\tjaccard\tn_intersections
+#[pyfunction]
+#[pyo3(signature = (a, b, output = None))]
+pub fn jaccard(
+    py: Python<'_>,
+    a: &str,
+    b: &str,
+    output: Option<&str>,
+) -> PyResult<Option<String>> {
+    let result = py
+        .allow_threads(|| -> Result<Vec<u8>, BedError> {
+            let a_path = PathBuf::from(a);
+            let b_path = PathBuf::from(b);
+
+            let cmd = JaccardCommand::new();
+
+            let mut buffer = Vec::new();
+            cmd.run(&a_path, &b_path, &mut buffer)?;
+            Ok(buffer)
+        })
+        .map_err(to_py_err)?;
+
+    if let Some(output_path) = output {
+        std::fs::write(output_path, &result).map_err(|e| PyIOError::new_err(e.to_string()))?;
+        Ok(None)
+    } else {
+        let output_str =
+            String::from_utf8(result).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(Some(output_str))
+    }
+}
+
+/// Identify common intervals across multiple BED files.
+///
+/// Args:
+///     inputs: List of input BED file paths
+///     output: Optional output file path
+///     cluster: Only output intervals found in all files
+///
+/// Returns:
+///     Multiinter output as string if output is None, otherwise None.
+#[pyfunction]
+#[pyo3(signature = (inputs, output = None, cluster = false))]
+pub fn multiinter(
+    py: Python<'_>,
+    inputs: Vec<String>,
+    output: Option<&str>,
+    cluster: bool,
+) -> PyResult<Option<String>> {
+    if inputs.len() < 2 {
+        return Err(PyValueError::new_err(
+            "multiinter requires at least 2 input files",
+        ));
+    }
+
+    let result = py
+        .allow_threads(|| -> Result<Vec<u8>, BedError> {
+            let input_paths: Vec<PathBuf> = inputs.iter().map(PathBuf::from).collect();
+
+            let mut cmd = StreamingMultiinterCommand::new();
+            cmd.cluster = cluster;
+            cmd.assume_sorted = true;
+
+            let mut buffer = Vec::new();
+            cmd.run(&input_paths, &mut buffer)?;
+            Ok(buffer)
+        })
+        .map_err(to_py_err)?;
+
+    if let Some(output_path) = output {
+        std::fs::write(output_path, &result).map_err(|e| PyIOError::new_err(e.to_string()))?;
+        Ok(None)
+    } else {
+        let output_str =
+            String::from_utf8(result).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(Some(output_str))
+    }
+}
+
+/// Generate synthetic BED datasets for benchmarking.
+///
+/// Args:
+///     output_dir: Output directory for generated files
+///     num_intervals: Number of intervals to generate
+///     seed: Random seed for reproducibility
+///     mode: Generation mode (balanced, skewed-a-gt-b, skewed-b-gt-a, identical, clustered)
+///     sorted: Whether to sort output (yes, no, auto)
+///     len_min: Minimum interval length
+///     len_max: Maximum interval length
+///
+/// Returns:
+///     Dictionary with generation statistics.
+#[pyfunction]
+#[pyo3(signature = (output_dir, num_intervals = 1000000, seed = 42, mode = "balanced", sorted = "auto", len_min = 50, len_max = 1000))]
+pub fn generate(
+    py: Python<'_>,
+    output_dir: &str,
+    num_intervals: u64,
+    seed: u64,
+    mode: &str,
+    sorted: &str,
+    len_min: u32,
+    len_max: u32,
+) -> PyResult<pyo3::Py<pyo3::types::PyDict>> {
+    let gen_mode = GenerateMode::from_str(mode).ok_or_else(|| {
+        PyValueError::new_err(format!(
+            "Invalid mode: {}. Use: balanced, skewed-a-gt-b, skewed-b-gt-a, identical, clustered",
+            mode
+        ))
+    })?;
+
+    let sort_mode = SortMode::from_str(sorted).ok_or_else(|| {
+        PyValueError::new_err(format!(
+            "Invalid sorted value: {}. Use: yes, no, auto",
+            sorted
+        ))
+    })?;
+
+    let stats = py
+        .allow_threads(|| -> Result<grit_genomics::commands::GenerateStats, BedError> {
+            let config = GenerateConfig {
+                output_dir: PathBuf::from(output_dir),
+                sizes: vec![SizeSpec { count: num_intervals }],
+                seed,
+                mode: gen_mode,
+                sorted: sort_mode,
+                custom_a: None,
+                custom_b: None,
+                hotspot_frac: 0.05,
+                hotspot_weight: 0.80,
+                len_min,
+                len_max,
+                force: true,
+            };
+
+            let cmd = GenerateCommand::new(config);
+            cmd.run()
+        })
+        .map_err(to_py_err)?;
+
+    // Convert stats to Python dict
+    let dict = pyo3::types::PyDict::new(py);
+    dict.set_item("files_generated", stats.total_files)?;
+    dict.set_item("total_intervals", stats.total_intervals)?;
+    dict.set_item("elapsed_seconds", stats.elapsed_secs)?;
+
+    Ok(dict.into())
+}
+
 // ============================================================================
 // I/O Utilities
 // ============================================================================
@@ -707,6 +1077,13 @@ fn pygrit(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(coverage, m)?)?;
     m.add_function(wrap_pyfunction!(closest, m)?)?;
     m.add_function(wrap_pyfunction!(window, m)?)?;
+    m.add_function(wrap_pyfunction!(sort, m)?)?;
+    m.add_function(wrap_pyfunction!(slop, m)?)?;
+    m.add_function(wrap_pyfunction!(complement, m)?)?;
+    m.add_function(wrap_pyfunction!(genomecov, m)?)?;
+    m.add_function(wrap_pyfunction!(jaccard, m)?)?;
+    m.add_function(wrap_pyfunction!(multiinter, m)?)?;
+    m.add_function(wrap_pyfunction!(generate, m)?)?;
 
     // I/O utilities
     m.add_function(wrap_pyfunction!(read_bed, m)?)?;

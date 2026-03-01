@@ -70,6 +70,27 @@ closest = pygrit.closest("a.bed", "b.bed")
 
 # Find intervals within window
 nearby = pygrit.window("a.bed", "b.bed", window=1000)
+
+# Sort a BED file
+pygrit.sort("unsorted.bed", output="sorted.bed")
+
+# Extend intervals (slop)
+pygrit.slop("regions.bed", "genome.txt", both=100.0, output="extended.bed")
+
+# Find gaps between intervals
+pygrit.complement("features.bed", "genome.txt", output="gaps.bed")
+
+# Genome-wide coverage
+pygrit.genomecov("reads.bed", "genome.txt", bg=True, output="coverage.bg")
+
+# Jaccard similarity
+pygrit.jaccard("set_a.bed", "set_b.bed", output="similarity.txt")
+
+# Multi-file intersection
+pygrit.multiinter(["a.bed", "b.bed", "c.bed"], output="overlap.bed")
+
+# Generate test data
+stats = pygrit.generate("./test_data", num_intervals=10000, seed=42)
 ```
 
 ## In-Memory API
@@ -120,6 +141,13 @@ output = intervals.to_numpy()
 | `coverage(a, b, ...)` | Calculate coverage depth | `bedtools coverage` |
 | `closest(a, b, ...)` | Find nearest intervals | `bedtools closest` |
 | `window(a, b, ...)` | Find intervals within distance | `bedtools window` |
+| `sort(input, ...)` | Sort BED file | `bedtools sort` |
+| `slop(input, genome, ...)` | Extend interval boundaries | `bedtools slop` |
+| `complement(input, genome)` | Find gaps between intervals | `bedtools complement` |
+| `genomecov(input, genome, ...)` | Genome-wide coverage | `bedtools genomecov` |
+| `jaccard(a, b)` | Jaccard similarity coefficient | `bedtools jaccard` |
+| `multiinter(inputs, ...)` | Multi-file intersection | `bedtools multiinter` |
+| `generate(output_dir, ...)` | Generate synthetic BED files | `bedtools random` |
 
 ### Classes
 
