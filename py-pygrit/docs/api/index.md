@@ -86,13 +86,15 @@ pygrit.__version__
 
 ## Input Requirements
 
-Most file-based functions require **sorted BED files** (sorted by chromosome, then by start position).
+!!! warning "Sorted Input Required"
+    Most file-based functions require **sorted BED files** (by chromosome, then start position).
 
-Sort files first:
+    **Unsorted input will produce incorrect results without warning.**
 
-```python
-pygrit.sort("unsorted.bed", output="sorted.bed")
-```
+    Always sort first:
+    ```python
+    pygrit.sort("unsorted.bed", output="sorted.bed")
+    ```
 
 Functions requiring a **genome file**: `slop`, `complement`, `genomecov`
 

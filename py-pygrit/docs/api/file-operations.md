@@ -2,8 +2,15 @@
 
 Streaming functions for processing BED files with O(k) memory complexity.
 
-!!! important "Sorted Input Required"
-    All file operations require sorted BED files (by chromosome, then start position).
+!!! warning "Sorted Input Required"
+    All file operations require **sorted BED files** (by chromosome, then start position).
+
+    **Unsorted input will produce incorrect results without warning.**
+
+    Always sort first:
+    ```python
+    pygrit.sort("unsorted.bed", output="sorted.bed")
+    ```
 
 ---
 

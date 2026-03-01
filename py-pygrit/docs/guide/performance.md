@@ -6,21 +6,31 @@ This guide covers best practices for using pygrit effectively.
 
 ### 1. Sort Your Input Files
 
-Most pygrit functions require sorted BED files (sorted by chromosome, then by start position).
+!!! warning "Critical: Sorted Input Required"
+    Most pygrit functions require **sorted BED files** (sorted by chromosome, then by start position).
 
-```bash
-# Using grit CLI
-grit sort -i unsorted.bed > sorted.bed
+    **Unsorted input will produce incorrect results without warning.**
 
-# Using Unix sort
-sort -k1,1 -k2,2n input.bed > sorted.bed
-```
+    pygrit uses streaming algorithms that process intervals in a single pass. This approach
+    requires sorted input to function correctly. Unlike the CLI which validates sort order
+    by default, the Python API assumes your input is already sorted for maximum performance.
 
-Or in Python:
+Sort your files first:
 
-```python
-pygrit.sort("unsorted.bed", output="sorted.bed")
-```
+=== "Python"
+    ```python
+    pygrit.sort("unsorted.bed", output="sorted.bed")
+    ```
+
+=== "grit CLI"
+    ```bash
+    grit sort -i unsorted.bed > sorted.bed
+    ```
+
+=== "Unix"
+    ```bash
+    sort -k1,1 -k2,2n input.bed > sorted.bed
+    ```
 
 ### 2. Use Output Files for Large Results
 

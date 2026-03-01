@@ -77,23 +77,27 @@ pygrit.sort("unsorted.bed", output="sorted.bed")
 
 ## Input Requirements
 
-**Important**: Most functions require sorted BED files (sorted by chromosome, then by start position).
+!!! warning "Sorted Input Required"
+    Most file-based functions require **sorted BED files** (by chromosome, then start position).
+
+    **Unsorted input will produce incorrect results without warning.**
 
 Sort your files first:
 
-```bash
-# Using grit CLI
-grit sort -i unsorted.bed > sorted.bed
+=== "Python"
+    ```python
+    pygrit.sort("unsorted.bed", output="sorted.bed")
+    ```
 
-# Using Unix sort
-sort -k1,1 -k2,2n unsorted.bed > sorted.bed
-```
+=== "grit CLI"
+    ```bash
+    grit sort -i unsorted.bed > sorted.bed
+    ```
 
-Or in Python:
-
-```python
-pygrit.sort("unsorted.bed", output="sorted.bed")
-```
+=== "Unix"
+    ```bash
+    sort -k1,1 -k2,2n unsorted.bed > sorted.bed
+    ```
 
 ## File-Based vs In-Memory Operations
 
