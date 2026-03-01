@@ -1,6 +1,10 @@
-# pygrit
+# grit-genomics
 
-Python bindings for GRIT (Genomic Range Interval Toolkit) - high-performance genomic interval operations powered by Rust.
+Python bindings for [GRIT](https://github.com/manish59/grit) (Genomic Range Interval Toolkit).
+
+[![PyPI](https://img.shields.io/pypi/v/grit-genomics.svg)](https://pypi.org/project/grit-genomics/)
+[![Python](https://img.shields.io/pypi/pyversions/grit-genomics.svg)](https://pypi.org/project/grit-genomics/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Installation
 
@@ -12,12 +16,16 @@ The package is imported as `pygrit`:
 
 ```python
 import pygrit
+print(pygrit.__version__)
 ```
 
-Or build from source:
+### Building from Source
+
+Requires [Rust](https://rustup.rs/) and [maturin](https://github.com/PyO3/maturin):
 
 ```bash
 cd py-pygrit
+pip install maturin
 maturin develop --release
 ```
 
@@ -26,185 +34,177 @@ maturin develop --release
 ```python
 import pygrit
 
-# File-based streaming (recommended for large files)
-# Uses O(k) memory where k = max overlapping intervals
-results = pygrit.intersect("a.bed", "b.bed")
-pygrit.merge("input.bed", output="merged.bed", distance=100)
-pygrit.coverage("regions.bed", "reads.bed", output="coverage.bed")
+# Find overlapping intervals between two BED files
+overlaps = pygrit.intersect("a.bed", "b.bed")
+print(f"Found {len(overlaps)} overlapping intervals")
 
-# In-memory operations
-intervals = pygrit.read_bed("regions.bed")
-merged = intervals.merge(distance=100)
+# Merge overlapping intervals
+merged = pygrit.merge("input.bed")
 
-# Work with individual intervals
-iv = pygrit.Interval("chr1", 100, 200)
-print(len(iv))  # 100
+# Write results to file
+pygrit.intersect("a.bed", "b.bed", output="overlaps.bed")
 ```
 
-## File-Based Streaming API
+## Available Functions
 
-For large BED files (millions of intervals), use the file-based functions that maintain streaming behavior:
+### File Operations
+
+All functions accept file paths and optionally write to an output file.
+
+| Function | Description | Requires |
+|----------|-------------|----------|
+| `intersect(a, b)` | Find overlapping intervals | Sorted input |
+| `merge(input)` | Merge overlapping intervals | Sorted input |
+| `subtract(a, b)` | Remove overlapping regions | Sorted input |
+| `coverage(a, b)` | Calculate coverage depth | Sorted input |
+| `closest(a, b)` | Find nearest intervals | Sorted input |
+| `window(a, b)` | Find intervals within distance | Sorted input |
+| `sort(input)` | Sort a BED file | - |
+| `slop(input, genome)` | Extend interval boundaries | Genome file |
+| `complement(input, genome)` | Find gaps between intervals | Genome file, sorted input |
+| `genomecov(input, genome)` | Genome-wide coverage | Genome file, sorted input |
+| `jaccard(a, b)` | Jaccard similarity coefficient | Sorted input |
+| `multiinter(inputs)` | Multi-file intersection | Sorted input |
+| `generate(output_dir)` | Generate synthetic BED files | - |
+
+### Example Usage
 
 ```python
 import pygrit
 
-# Intersect two BED files
-results = pygrit.intersect("a.bed", "b.bed")  # Returns list of Interval
-pygrit.intersect("a.bed", "b.bed", output="out.bed")  # Writes to file
+# intersect - find overlapping intervals
+overlaps = pygrit.intersect("a.bed", "b.bed")
+pygrit.intersect("a.bed", "b.bed", output="out.bed")
+pygrit.intersect("a.bed", "b.bed", fraction=0.5, reciprocal=True)
 
-# With options (matching bedtools flags)
-pygrit.intersect(
-    "a.bed", "b.bed",
-    write_a=True,      # -wa
-    write_b=True,      # -wb
-    fraction=0.5,      # -f 0.5
-    reciprocal=True,   # -r
-    no_overlap=True,   # -v
-)
+# merge - combine overlapping intervals
+merged = pygrit.merge("input.bed")
+pygrit.merge("input.bed", distance=100)  # merge within 100bp
 
-# Merge overlapping intervals
-merged = pygrit.merge("input.bed", distance=100)
-
-# Subtract intervals
+# subtract - remove overlapping regions
 remaining = pygrit.subtract("a.bed", "b.bed")
 
-# Calculate coverage
-coverage = pygrit.coverage("regions.bed", "reads.bed")
-
-# Find closest intervals
-closest = pygrit.closest("a.bed", "b.bed")
-
-# Find intervals within window
-nearby = pygrit.window("a.bed", "b.bed", window=1000)
-
-# Sort a BED file
+# sort - sort a BED file
 pygrit.sort("unsorted.bed", output="sorted.bed")
 
-# Extend intervals (slop)
-pygrit.slop("regions.bed", "genome.txt", both=100.0, output="extended.bed")
+# slop - extend intervals (requires genome file)
+pygrit.slop("regions.bed", "genome.txt", both=100.0)
+pygrit.slop("regions.bed", "genome.txt", left=50.0, right=100.0)
 
-# Find gaps between intervals
-pygrit.complement("features.bed", "genome.txt", output="gaps.bed")
+# complement - find gaps
+gaps = pygrit.complement("features.bed", "genome.txt")
 
-# Genome-wide coverage
-pygrit.genomecov("reads.bed", "genome.txt", bg=True, output="coverage.bg")
+# genomecov - coverage histogram or bedgraph
+pygrit.genomecov("reads.bed", "genome.txt", bg=True)
 
-# Jaccard similarity
-pygrit.jaccard("set_a.bed", "set_b.bed", output="similarity.txt")
+# jaccard - similarity between two files
+result = pygrit.jaccard("a.bed", "b.bed")
 
-# Multi-file intersection
-pygrit.multiinter(["a.bed", "b.bed", "c.bed"], output="overlap.bed")
+# multiinter - intersection across multiple files
+pygrit.multiinter(["a.bed", "b.bed", "c.bed"])
 
-# Generate test data
+# generate - create synthetic test data
 stats = pygrit.generate("./test_data", num_intervals=10000, seed=42)
 ```
 
-## In-Memory API
+### In-Memory Operations
 
-For smaller datasets or programmatic interval manipulation:
+For programmatic interval manipulation:
+
+```python
+import pygrit
+
+# Read intervals from file
+intervals = pygrit.read_bed("regions.bed")
+print(f"Loaded {len(intervals)} intervals")
+
+# Parse from string
+intervals = pygrit.parse_bed("chr1\t100\t200\nchr1\t150\t250\n")
+
+# Create individual intervals
+iv = pygrit.Interval("chr1", 100, 200)
+print(iv.chrom, iv.start, iv.end)  # chr1 100 200
+print(len(iv))  # 100
+
+# Check overlap
+iv2 = pygrit.Interval("chr1", 150, 250)
+print(iv.overlaps(iv2))  # True
+print(iv.overlap_length(iv2))  # 50
+
+# Merge intervals
+merged = intervals.merge(distance=0)
+
+# Find intersections
+other = pygrit.read_bed("other.bed")
+overlaps = intervals.intersect(other)
+```
+
+### NumPy Integration
 
 ```python
 import pygrit
 import numpy as np
 
-# Read a BED file
-intervals = pygrit.read_bed("regions.bed")
-
-# Create intervals from a string
-intervals = pygrit.parse_bed("""
-chr1	100	200
-chr1	150	250
-chr1	300	400
-""")
-
-# Merge overlapping intervals
-merged = intervals.merge(distance=100)
-
-# Find intersections
-other = pygrit.read_bed("other.bed")
-overlaps = intervals.intersect(other, fraction=0.5)
-
-# Find non-overlapping intervals
-non_overlapping = intervals.non_overlapping(other)
-
-# Work with NumPy arrays
-arr = np.array([[0, 100], [150, 200]], dtype=np.int64)
+# Create from NumPy array (shape: n x 2)
+arr = np.array([[100, 200], [300, 400]], dtype=np.int64)
 intervals = pygrit.from_numpy("chr1", arr)
 
 # Convert back to NumPy
 output = intervals.to_numpy()
+print(output.shape)  # (2, 2)
 ```
 
-## API Reference
+## Input Requirements
 
-### File-Based Functions
+- **Sorted input**: Most functions require BED files sorted by chromosome and start position
+- **Genome file**: Functions like `slop`, `complement`, `genomecov` require a genome file (tab-separated: chromosome name and size)
 
-| Function | Description | bedtools equivalent |
-|----------|-------------|---------------------|
-| `intersect(a, b, ...)` | Find overlapping intervals | `bedtools intersect` |
-| `merge(input, ...)` | Merge overlapping intervals | `bedtools merge` |
-| `subtract(a, b, ...)` | Remove overlapping regions | `bedtools subtract` |
-| `coverage(a, b, ...)` | Calculate coverage depth | `bedtools coverage` |
-| `closest(a, b, ...)` | Find nearest intervals | `bedtools closest` |
-| `window(a, b, ...)` | Find intervals within distance | `bedtools window` |
-| `sort(input, ...)` | Sort BED file | `bedtools sort` |
-| `slop(input, genome, ...)` | Extend interval boundaries | `bedtools slop` |
-| `complement(input, genome)` | Find gaps between intervals | `bedtools complement` |
-| `genomecov(input, genome, ...)` | Genome-wide coverage | `bedtools genomecov` |
-| `jaccard(a, b)` | Jaccard similarity coefficient | `bedtools jaccard` |
-| `multiinter(inputs, ...)` | Multi-file intersection | `bedtools multiinter` |
-| `generate(output_dir, ...)` | Generate synthetic BED files | `bedtools random` |
-
-### Classes
-
-#### `Interval`
-A single genomic interval (0-based, half-open).
-
-```python
-iv = pygrit.Interval("chr1", 100, 200)
-iv.chrom          # "chr1"
-iv.start          # 100
-iv.end            # 200
-len(iv)           # 100
-iv.overlaps(iv2)  # True/False
-iv.overlap_length(iv2)  # overlap bases
-iv.distance_to(iv2)     # distance or None
+Example genome file:
+```
+chr1	248956422
+chr2	242193529
+chr3	198295559
 ```
 
-#### `IntervalSet`
-A collection of intervals with bulk operations.
-
-```python
-intervals = pygrit.read_bed("file.bed")
-len(intervals)                    # count
-intervals[0]                      # first interval
-intervals.merge(distance=0)       # merge overlapping
-intervals.intersect(other)        # find overlaps
-intervals.sort()                  # sort in place
-intervals.to_list()               # list of Interval
-intervals.to_numpy()              # numpy array
+Sort files with:
+```bash
+sort -k1,1 -k2,2n input.bed > sorted.bed
+# or
+grit sort -i input.bed > sorted.bed
 ```
-
-### I/O Functions
-
-- `read_bed(path)` - Read intervals from a BED file
-- `parse_bed(content)` - Parse intervals from a string
-- `from_numpy(chrom, arr)` - Create IntervalSet from NumPy array (n, 2)
-
-## Performance
-
-pygrit maintains the streaming architecture of GRIT:
-- O(k) memory complexity where k = max overlapping intervals
-- GIL released during computation for full parallelism
-- Zero-copy file I/O when writing to output files
-- Rayon-based parallel processing
 
 ## Requirements
 
 - Python >= 3.9
 - NumPy >= 1.20
-- Input files should be sorted for streaming functions (use `grit sort` or `sort -k1,1 -k2,2n`)
+
+## Platform Support
+
+Pre-built wheels available for:
+- macOS (ARM64)
+
+For other platforms, pip will build from source (requires Rust toolchain).
+
+## Testing
+
+```bash
+pip install pytest
+pytest tests/
+```
 
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Acknowledgments
+
+- [GRIT](https://github.com/manish59/grit) - The underlying Rust implementation
+- [bedtools](https://bedtools.readthedocs.io/) by Aaron Quinlan - The original genomic interval toolkit
+- [PyO3](https://pyo3.rs/) - Rust bindings for Python
+- [maturin](https://github.com/PyO3/maturin) - Build system for Rust Python extensions
+
+## Links
+
+- [PyPI Package](https://pypi.org/project/grit-genomics/)
+- [GitHub Repository](https://github.com/manish59/grit)
+- [GRIT Documentation](https://manish59.github.io/grit/)
