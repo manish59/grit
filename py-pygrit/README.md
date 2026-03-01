@@ -5,7 +5,13 @@ Python bindings for GRIT (Genomic Range Interval Toolkit) - high-performance gen
 ## Installation
 
 ```bash
-pip install pygrit
+pip install grit-genomics
+```
+
+The package is imported as `pygrit`:
+
+```python
+import pygrit
 ```
 
 Or build from source:
