@@ -5,6 +5,7 @@ A genomic interval toolkit written in Rust, inspired by [bedtools](https://bedto
 [![CI](https://github.com/manish59/grit/actions/workflows/ci.yml/badge.svg)](https://github.com/manish59/grit/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/grit-genomics.svg)](https://crates.io/crates/grit-genomics)
 [![PyPI](https://img.shields.io/pypi/v/grit-genomics.svg)](https://pypi.org/project/grit-genomics/)
+[![Documentation](https://readthedocs.org/projects/grit-genomics/badge/?version=latest)](https://grit-genomics.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -172,14 +173,18 @@ iv = pygrit.Interval("chr1", 100, 200)
 print(len(iv))  # 100
 ```
 
-See [py-pygrit/README.md](py-pygrit/README.md) for full Python API documentation.
+See [grit-genomics.readthedocs.io](https://grit-genomics.readthedocs.io/) for full Python API documentation.
 
 ---
 
 ## Documentation
 
-- [Command Reference](https://manish59.github.io/grit/) - All commands with examples
-- [Python API](py-pygrit/README.md) - Python bindings documentation
+- [Command Reference](https://manish59.github.io/grit/) - CLI commands with examples
+- [Python API](https://grit-genomics.readthedocs.io/) - Python bindings documentation (Read the Docs)
+- [Rust Library Cookbook](docs/RUST_COOKBOOK.md) - Using GRIT as a Rust library
+- [Performance Tuning](docs/PERFORMANCE.md) - Optimization guide
+- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common errors and solutions
+- [Streaming Model](docs/STREAMING_MODEL.md) - Memory-efficient algorithms
 
 ---
 
